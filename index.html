@@ -987,12 +987,12 @@ button {
       </style>
 </head>
 <body>
-    <div id="loginSection" style="display: block; text-align: center; margin-top: 30px;">
+   <div id="loginSection" style="display: block; text-align: center; margin-top: 30px;">
  <div class="logo">
         <img src="https://i.imgur.com/uWrz8rt.png" alt="School Logo" class="logo-img">
     </div>
    <h1>RASM School Management System</h1>
-<p style="color: red; font-weight: bold;">Nachu Primary  School </p>
+<p style="color: red; font-weight: bold;">Nachu Primary  School</p>
     <form id="loginForm">
         <input type="text" id="username" placeholder="Username" required><br><br>
         <input type="password" id="password" placeholder="Password" required><br><br>
@@ -1028,7 +1028,7 @@ button {
         <h1>Welcome To Rasm School Automation Management System</h1>
 <p style="color: red; font-weight: bold;">Your Gateway To Smooth And Efficient School Management </p>
     </div>
-<p style="color: red; font-weight: bold;">Nachu Primary  School </p>
+<p style="color: red; font-weight: bold;">Nachu Primary  School</p>
 </header>
 <button class="btn-yellow" onclick="toggleSection('registerLearnerSection')">
         <span class="material-icons">person_add</span> Register Learner
@@ -1177,7 +1177,7 @@ button {
 
 <div id="juniorMarksEntrySection" style="max-width: 400px; margin: auto; display: none;">
  
-    <h2>Junior School Marks Entry Section </h2>
+    <h2> Marks Entry Section </h2>
     <form id="marksForm">
         Learner: 
         <select id="learnerSelect"></select><br>
@@ -1193,7 +1193,10 @@ button {
             Religious Education: <input type="number" id="religion" required><br>
             Creative Art: <input type="number" id="art" required><br>
         </div>
-        <button type="submit">Submit Marks</button>
+       <button type="submit" style="display: flex; align-items: center; gap: 5px; padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    <span class="material-icons">send</span> Submit Marks
+</button>
+
     </form>
 </div>
 <!-- Success Message -->
@@ -1291,7 +1294,7 @@ button {
             <th>Grade</th> <!-- Grade -->
             <th>Eng</th><th>Lev</th>
             <th>Math</th><th>Lev</th>
-            <th>Pre-Tech</th><th>Lev</th>
+          
             <th>Kiswa</th><th>Lev</th>
             <th>Scie</th><th>Lev</th>
             <th>Sst</th><th>Lev</th>
@@ -1596,6 +1599,7 @@ button {
 
 <div id="savedTablesContainer"></div>
 </div> 
+
     <!-- Footer Section -->
     <footer id="footer" style="display: none; background-color: #2196F3; color: white; padding: 5px 0; text-align: center;">
         <p>&copy; 2025 Nachu Primary  School | All Rights Reserved</p>
@@ -3300,7 +3304,7 @@ function toggleJuniorSchoolActions() {
     const section = document.getElementById('juniorSchoolActions');
     section.style.display = (section.style.display === 'none') ? 'block' : 'none';
 }
-function generateBulkReports() {
+function generateBulkReports() { 
     const selectedGrade = bulkGradeSelect.value;
     const learnersInGrade = marks.filter(mark => mark.grade === selectedGrade);
 
@@ -3330,8 +3334,8 @@ function generateBulkReports() {
                     <div style="clear:both; padding-bottom:10px;">
                         ${schoolLogo}
                         <div style="margin-left:110px;">
-                            <h2 style="margin:0; font-size:20px;">Nachu Primary School Assessment Report</h2>
-                            <h3 style="margin:0; font-size:16px;">P.O BOX 531-00902 Kikuyu</h3>
+                            <h2 style="margin:0; font-size:20px;"> Lusigetti Primary  School Assessment Report</h2>
+                            <h3 style="margin:0; font-size:16px;">P.O BOX 104-00902 Kikuyu</h3>
                             <h4 style="margin:0; font-size:14px;">Ministry Of Education Science And Technology</h4>
                         </div>
                     </div>
@@ -3360,8 +3364,16 @@ function generateBulkReports() {
                             ${generateSubjectRows(learnerData, teacherNames)}
                         </tbody>
                     </table>
-                    <div class="total-marks" style="border: 4px solid #000; padding: 10px; margin-top: 10px; width: fit-content;">
-                        <strong>Total Marks: ${learnerData.totalMarks}</strong>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 10px;">
+                        <div style="border: 3px solid #000; padding: 8px; flex: 1; text-align: center;">
+                            <strong>Total Marks: ${learnerData.totalMarks}</strong>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <span style="font-size: 14px;">
+           KEY:1 Below Expectation, 2 Approaching Expectation, 3 Meeting Expectation, 4 Exceeding Expectation
+
+                            </span>
+                        </div>
                     </div>
                     <div class="comment-section">
                         Teacher Comments On Competencies Achieved/Acquisition Of Values: <br>
@@ -3377,8 +3389,8 @@ function generateBulkReports() {
                         Class Teacher Signature: ${details.classTeacherSignature || '_____________'}<br>
                         Principal Signature: ${details.principalSignature || '_____________'}<br>
                         Official Stamp: <div class="stamp">
-                            Nachu Primary School <br>
-                            P.O BOX 531-00902 Kikuyu<br>
+                             Nachu Primary  School <br>
+                            P.O BOX 561-00902 Kikuyu<br>
                             Date: ${formattedDate}<br>
                         </div>
                     </div>
@@ -3392,21 +3404,32 @@ function generateBulkReports() {
     });
 }
 
-function generateSubjectRows(learnerData, teacherNames) {
+function generateSubjectRows(learnerData, teacherNames) { 
     const subjects = [
         'English', 'Mathematics',  'Kiswahili', 
         'Science & Technology ', 'Social Studies', 'Agriculture &Nutrition', 
-        'Religious Education', 'Creative Art'
+        'Religious Education', 'Creative Arts & Sports'
     ];
-    return subjects.map((subject, index) => `
-        <tr>
-            <td>${subject}</td>
-            <td>${learnerData.scores[index]}</td>
-            <td>${getLevel(learnerData.scores[index])}</td>
-            <td>${teacherNames[subject]}</td>
-            <td>______</td>
-        </tr>
-    `).join('');
+
+    return subjects.map((subject, index) => {
+        const teacherName = teacherNames[subject] || "Unknown Teacher";
+        
+        // Extract the initials of the teacher's name
+        const initials = teacherName
+            .split(" ") // Split the name into parts
+            .map(word => word.charAt(0)) // Take the first letter of each part
+            .join(""); // Combine the initials
+        
+        return `
+            <tr>
+                <td>${subject}</td>
+                <td>${learnerData.scores[index]}</td>
+                <td>${getLevel(learnerData.scores[index])}</td>
+                <td>${teacherName}</td>
+                <td>${initials}</td> <!-- Automatically filled signature -->
+            </tr>
+        `;
+    }).join('');
 }
 
 function getDynamicDetails(callback) {
@@ -3460,7 +3483,7 @@ function getTeacherNames(callback) {
     const subjects = [
         'English', 'Mathematics',  'Kiswahili', 
         'Science & Technology ', 'Social Studies', 'Agriculture &Nutrition', 
-        'Religious Education', 'Creative Art'
+        'Religious Education', 'Creative Arts & Sports'
     ];
     const teacherNames = {};
     let currentSubjectIndex = 0;
