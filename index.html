@@ -3780,11 +3780,11 @@ function printMarksTable() {
                     <table class="report-table">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Learner</th>
                                 <th>Grade</th>
                                 <th>Eng</th><th>Level</th>
                                 <th>Math</th><th>Level</th>
-                                
                                 <th>Kiswa</th><th>Level</th>
                                 <th>Scie</th><th>Level</th>
                                 <th>Social</th><th>Level</th>
@@ -3795,8 +3795,9 @@ function printMarksTable() {
                             </tr>
                         </thead>
                         <tbody>
-                            ${marks.map(mark => `
+                            ${marks.map((mark, index) => `
                                 <tr>
+                                    <td>${index + 1}</td>
                                     <td>${mark.learner}</td>
                                     <td>${mark.grade}</td>
                                     ${mark.scores.map(score => `<td>${score}</td><td>${getLevel(score)}</td>`).join('')}
@@ -3804,19 +3805,19 @@ function printMarksTable() {
                                 </tr>
                             `).join('')}
                             <tr>
-                                <td colspan="2" style="font-weight:bold;">Total</td>
+                                <td colspan="3" style="font-weight:bold;">Total</td>
                                 ${subjectTotals.map(total => `<td style="font-weight:bold;">${total}</td><td></td>`).join('')}
                                 <td style="font-weight:bold;">${totalMarksSum}</td>
                             </tr>
                             <tr>
-                                <td colspan="2" style="font-weight:bold;">Average</td>
+                                <td colspan="3" style="font-weight:bold;">Average</td>
                                 ${averages.map(avg => `<td style="font-weight:bold;">${avg}</td><td></td>`).join('')}
                                 <td style="font-weight:bold;">${overallAverage}</td>
                             </tr>
                         </tbody>
                     </table>
                     <!-- Append the stamp after printing the table -->
-                    <div class="stamp">Nachu Primary  School  <br>P.O BOX 531-00902 Kikuyu</div>
+                    <div class="stamp"> Nachu Primary School  <br>P.O BOX 561-00902 Kikuyu</div>
                 </body>
             </html>
         `);
