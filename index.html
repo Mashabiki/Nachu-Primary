@@ -4866,8 +4866,8 @@ function promoteLearners() {
             const stream = gradeMatch[2];
             console.log(`Current Grade: ${currentGrade}, Stream: ${stream}`);
             
-            // Promote learners in grades 4, 5, and 6
-            if (currentGrade >= 4 && currentGrade <= 6) {
+            // Promote learners in grades 1 ,2, 3, 4, 5, 6, 7,and 8
+            if (currentGrade >= 1 && currentGrade <= 8) {
                 const newGrade = (currentGrade + 1) + stream;
                 learner.grade = newGrade;
                 console.log(`Promoted to: ${learner.grade}`);
