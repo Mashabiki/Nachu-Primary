@@ -4065,19 +4065,19 @@ function printSubjectRanking() {
     printWindow.print();
  
 }
-    function updateLearnerSelect() {
-        const learnersWithoutMarks = learners.filter(learner => 
-            !marks.some(mark => mark.learner === learner.name)
-        );
+   function updateLearnerSelect() {
+    const learnersWithoutMarks = learners.filter(learner =>
+        !marks.some(mark => mark.learner === learner.name)
+    );
 
-        learnerSelect.innerHTML = learnersWithoutMarks.map(learner => 
-            `<option value="${learner.name}">${learner.name}</option>`
-        ).join("");
+    learnerSelect.innerHTML = learnersWithoutMarks.map(learner =>
+        `<option value="${learner.name}">${learner.name} (Grade ${learner.grade})</option>`
+    ).join("");
 
-        if (learnersWithoutMarks.length === 0) {
-            learnerSelect.innerHTML = `<option value="" disabled>No learners available</option>`;
-        }
+    if (learnersWithoutMarks.length === 0) {
+        learnerSelect.innerHTML = `<option value="" disabled>No learners available</option>`;
     }
+}  
 
     document.getElementById("marksForm").addEventListener("submit", function (e) {
         e.preventDefault();
