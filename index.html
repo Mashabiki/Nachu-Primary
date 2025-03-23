@@ -1101,6 +1101,17 @@ button {
   style="width: 50%; padding: 10px; margin-bottom: 15px; background-color: #9C27B0; color: white; border: none; border-radius: 5px; cursor: pointer;">
   <i class="fas fa-chart-bar"></i> Payment Summary Per Grade
 </button>
+       
+<!-- Delete All Fee Records Button -->
+<button onclick="deleteFeeRecordsTable()" 
+  style="padding: 10px; background: red; color: white; border: none; cursor: pointer; border-radius: 5px;">
+  <i class="fas fa-trash-alt"></i> Delete All Fee Records
+</button>
+<!-- Button to Show Learner Count -->
+<button onclick="openOnlyOneSection('learnerCountContainer')" 
+  style="background: #4CAF50; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+  <i class="fas fa-users"></i> Show Learner Count Per Grade
+</button>
 
 <!-- Learner Count Display Section -->
 <div id="learnerCountContainer" style="display: none; margin-top: 10px; font-weight: bold; text-align: center;">
@@ -1111,14 +1122,6 @@ button {
     <i class="fas fa-print"></i> Print Learner Count
   </button>
 </div>
-
-       
-<!-- Delete All Fee Records Button -->
-<button onclick="deleteFeeRecordsTable()" 
-  style="padding: 10px; background: red; color: white; border: none; cursor: pointer; border-radius: 5px;">
-  <i class="fas fa-trash-alt"></i> Delete All Fee Records
-</button>
-
 
 
     </div>
