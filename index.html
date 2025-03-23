@@ -1072,11 +1072,11 @@ button {
   <i class="fas fa-archive"></i> Archive Fees
 </button>
 
-<!-- View Archived Fees Button -->
-<button id="toggleViewArchivedBtn" onclick="openOnlyOneSection('archivedFeesContainer')" 
+<button id="toggleViewArchivedBtn" onclick="viewArchivedFees(); openOnlyOneSection('archivedFeesContainer');" 
   style="width: 40%; padding: 10px; background-color: #1976D2; color: white; border: none; border-radius: 5px; cursor: pointer;">
   <i class="fas fa-eye"></i> View Archived Fees
 </button>
+
 
 <!-- Print Payment Summary Button -->
 <button onclick="printPaymentSummary()" id="printSummaryBtn" 
@@ -1161,20 +1161,19 @@ button {
     style="margin-bottom: 10px; padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 5px; text-align: center;">
 
     <!-- Grade Filter -->
-    <label for="gradeFilter"><strong>Filter by Grade:</strong></label>
+  <label for="gradeFilter"><strong>Filter by Grade:</strong></label>
     <select id="gradeFilter" onchange="filterFeeRecords()">
-        <option value="">All Grades</option>
-        <option value="1">Grade 1</option>
-        <option value="2">Grade 2</option>
-        <option value="3">Grade 3</option>
-        <option value="4">Grade 4</option>
-        <option value="5">Grade 5</option>
-        <option value="6">Grade 6</option>
-        <option value="7">Grade 7</option>
-        <option value="8">Grade 8</option>
-        <option value="9">Grade 9</option>
+      <option value="">All Grades</option>
+      <option value="1">Grade 1</option>
+      <option value="2">Grade 2</option>
+      <option value="3">Grade 3</option>
+      <option value="4">Grade 4</option>
+      <option value="5">Grade 5</option>
+      <option value="6">Grade 6</option>
+      <option value="7">Grade 7</option>
+      <option value="8">Grade 8</option>
+      <option value="9">Grade 9</option>
     </select>
-
     <table class="learners-table" id="feeSummaryTable" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
         <thead>
             <tr style="background: #4CAF50; color: white;">
@@ -1365,19 +1364,19 @@ button {
     style="margin-bottom: 10px; padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 5px; text-align: center;">
 
     <!-- Grade Filter -->
-    <label for="gradeFilter"><strong>Filter by Grade:</strong></label>
-    <select id="gradeFilter" onchange="generateDefaultersList()">
-        <option value="">All Grades</option>
-        <option value="1">Grade 1</option>
-        <option value="2">Grade 2</option>
-        <option value="3">Grade 3</option>
-        <option value="4">Grade 4</option>
-        <option value="5">Grade 5</option>
-        <option value="6">Grade 6</option>
-        <option value="7">Grade 7</option>
-        <option value="8">Grade 8</option>
-        <option value="9">Grade 9</option>
-    </select>
+   <label for="defaultersGradeFilter"><strong>Filter by Grade:</strong></label>
+<select id="defaultersGradeFilter" onchange="filterDefaulters()">
+  <option value="">All Grades</option>
+  <option value="1">Grade 1</option>
+  <option value="2">Grade 2</option>
+  <option value="3">Grade 3</option>
+  <option value="4">Grade 4</option>
+  <option value="5">Grade 5</option>
+  <option value="6">Grade 6</option>
+  <option value="7">Grade 7</option>
+  <option value="8">Grade 8</option>
+  <option value="9">Grade 9</option>
+</select>
 
     <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
         <thead>
@@ -9781,6 +9780,19 @@ function printMarksTable() {
 
         hideLoadingSpinner(); // Hide spinner after printing
     }, 2000);
+}
+function filterDefaulters() {
+  const selectedGrade = document.getElementById("defaultersGradeFilter").value;
+  const table = document.getElementById("defaultersTableBody");
+  const rows = table.getElementsByTagName("tr");
+
+  for (let i = 0; i < rows.length; i++) {
+    const gradeCell = rows[i].getElementsByTagName("td")[2]; // Grade column
+    if (gradeCell) {
+      const grade = gradeCell.textContent || gradeCell.innerText;
+      rows[i].style.display = (selectedGrade === "" || grade === selectedGrade) ? "" : "none";
+    }
+  }
 }
 
  </script>         
