@@ -1551,7 +1551,7 @@ button {
         Insha: <input type="number" id="insha" required><br>
         Kiswahili: <input type="number" id="kiswahili" required><br>
         Math: <input type="number" id="math" required><br>
-        Integrated Science: <input type="number" id="science" required><br>
+        Science: <input type="number" id="science" required><br>
         Social Studies: <input type="number" id="social" required><br>
         Agriculture: <input type="number" id="agriculture" required><br>
         Religious Education: <input type="number" id="religion" required><br>
@@ -2087,40 +2087,39 @@ button {
         <i class="fas fa-chart-line"></i> View Full Report (Exam 1 - 6)
     </button>
 
-    <table id="pathwaysResultsTable" class="report-table">
-        <thead>
-            <tr>
-                <th rowspan="2">Learner</th>
-                <th rowspan="2">Grade</th>
-                <th colspan="6">STEM Subjects</th>
-                <th colspan="4">Social Sciences Subjects</th>
-                <th colspan="3">Sports, Arts & Science Subjects</th>
-                <th rowspan="2">STEM Average</th>
-                <th rowspan="2">Social Sciences Average</th>
-                <th rowspan="2">Sports, Arts & Science Average</th>
-                <th rowspan="2">Best Pathway</th>
-            </tr>
-            <tr>
-                <!-- STEM Subjects -->
-                <th>ENG</th>
-                <th>MATHS</th>
-                <th>PRE-TECH</th>
-                <th>KISWA</th>
-                <th>I Scie</th>
-                <th>AGRIC</th>
-                <!-- Social Sciences Subjects -->
-                <th>Kiswa</th>
-                <th>ENG</th>
-                <th>SST</th>
-                <th>CRE</th>
-                <!-- Sports, Arts & Science Subjects -->
-                <th>KISWA</th>
-                <th>ENG</th>
-                <th>C/A</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<table id="pathwaysResultsTable" class="report-table">
+    <thead>
+        <tr>
+            <th rowspan="2">Learner</th>
+            <th rowspan="2">Grade</th>
+            <th colspan="5">STEM Subjects</th>
+            <th colspan="4">Social Sciences Subjects</th>
+            <th colspan="3">Sports, Arts & Science Subjects</th>
+            <th rowspan="2">STEM Average</th>
+            <th rowspan="2">Social Sciences Average</th>
+            <th rowspan="2">Sports, Arts & Science Average</th>
+            <th rowspan="2">Best Pathway</th>
+        </tr>
+        <tr>
+            <!-- STEM Subjects -->
+            <th>English</th>
+            <th>Kiswahili</th>
+            <th>Math</th>
+            <th>Science</th>
+            <th>Agriculture</th>
+            <!-- Social Sciences Subjects -->
+            <th>English</th>
+            <th>Kiswahili</th>
+            <th>Social Studies</th>
+            <th>CRE</th>
+            <!-- Sports, Arts & Science Subjects -->
+            <th>English</th>
+            <th>Kiswahili</th>
+            <th>Creative Arts</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
 
     <!-- Saved Reports Section -->
     <div id="savedReportsSection" style="display: none; margin-top: 20px;">
@@ -3969,23 +3968,29 @@ function removeLearner(index) {
     updateLearnersTable(); // Update the table after deletion
     localStorage.setItem('learners', JSON.stringify(learners)); // Save the updated list to local storage
 }
-function showSubjectPerformance() {
+function showSubjectPerformance() { 
     const subjectScores = {};
 
-    marks.forEach(mark => {
-        mark.scores.forEach((score, index) => {
-            const subjects = [
-                'English', 'Kiswahili','Mathematics',  
-                 'Science', 'Social Studies', 
-                'Agriculture', 'Religious Education', 'Creative Art'
-            ];
-            const subject = subjects[index];
+    // Define the correct 8 subjects
+    const subjects = [
+        "English", "Kiswahili", "Mathematics",  
+        "Science", "Social Studies", 
+        "Agriculture", "Religious Education", "Creative Arts"
+    ];
 
-            if (!subjectScores[subject]) {
-                subjectScores[subject] = { total: 0, count: 0 };
+    // Initialize subject tracking
+    subjects.forEach(subject => {
+        subjectScores[subject] = { total: 0, count: 0 };
+    });
+
+    marks.forEach(mark => {
+        subjects.forEach((subject, index) => {
+            let score = mark.scores[index] || 0; // Get the correct score
+
+            if (!isNaN(score) && score > 0) { // Ignore invalid values
+                subjectScores[subject].total += score;
+                subjectScores[subject].count++;
             }
-            subjectScores[subject].total += score;
-            subjectScores[subject].count++;
         });
     });
 
@@ -3998,9 +4003,12 @@ function showSubjectPerformance() {
         return "Invalid Score";
     }
 
+    // Compute means & performance levels
     const meanScores = Object.keys(subjectScores).map(subject => {
-        const mean = (subjectScores[subject].total / subjectScores[subject].count).toFixed(2);
-        const level = getPerformanceLevel(mean); // Get performance level
+        const mean = subjectScores[subject].count > 0 
+            ? (subjectScores[subject].total / subjectScores[subject].count).toFixed(2) 
+            : "N/A"; 
+        const level = mean !== "N/A" ? getPerformanceLevel(mean) : "N/A"; 
         return { subject, mean, level };
     }).sort((a, b) => b.mean - a.mean);
 
@@ -4017,7 +4025,7 @@ function showSubjectPerformance() {
                             </thead>
                             <tbody>`;
 
-    let number = 1; // Add numbering
+    let number = 1;
     meanScores.forEach(({ subject, mean, level }) => {
         performanceHtml += `<tr>
                                 <td>${number++}</td>
@@ -4032,7 +4040,6 @@ function showSubjectPerformance() {
     // Display the subject performance report
     document.getElementById("report").innerHTML = performanceHtml;
 }
-
 // Toggle visibility of the Registered Learners box
 function toggleRegisteredLearners() {
     const section = document.getElementById('registeredLearnersBox');
@@ -6286,31 +6293,37 @@ function generateGenderPerformance() {
         };
     });
 
-    // Extract marks data exactly as recorded
-    const marks = Array.from(marksTableBody.querySelectorAll("tr")).map(row => {
-        const cells = row.querySelectorAll("td");
-        return {
-            learner: cells[1]?.textContent.trim(),
-            grade: cells[2]?.textContent.trim(),
-            english: parseInt(cells[3]?.textContent.trim()) || 0,
-            englishLevel: cells[4]?.textContent.trim() || "-",
-            math: parseInt(cells[5]?.textContent.trim()) || 0,
-            mathLevel: cells[6]?.textContent.trim() || "-",
-             kiswahili: parseInt(cells[9]?.textContent.trim()) || 0,
-            kiswahiliLevel: cells[10]?.textContent.trim() || "-",
-            science: parseInt(cells[11]?.textContent.trim()) || 0,
-            scienceLevel: cells[12]?.textContent.trim() || "-",
-            social: parseInt(cells[13]?.textContent.trim()) || 0,
-            socialLevel: cells[14]?.textContent.trim() || "-",
-            agriculture: parseInt(cells[15]?.textContent.trim()) || 0,
-            agricultureLevel: cells[16]?.textContent.trim() || "-",
-            religion: parseInt(cells[17]?.textContent.trim()) || 0,
-            religionLevel: cells[18]?.textContent.trim() || "-",
-            art: parseInt(cells[19]?.textContent.trim()) || 0,
-            artLevel: cells[20]?.textContent.trim() || "-",
-            totalMarks: parseInt(cells[cells.length - 2]?.textContent.trim()) || 0
-        };
-    });
+  // Extract marks data exactly as recorded
+const marks = Array.from(marksTableBody.querySelectorAll("tr")).map((row, index) => {
+    const cells = row.querySelectorAll("td");
+    return {
+        number: index + 1, // Add numbering
+        learner: cells[1]?.textContent.trim(),
+        grade: cells[2]?.textContent.trim(),
+        gram: parseInt(cells[3]?.textContent.trim()) || 0,
+        comp: parseInt(cells[4]?.textContent.trim()) || 0,
+        eng: parseInt(cells[5]?.textContent.trim()) || 0,
+        engLevel: cells[6]?.textContent.trim() || "-",
+        lugha: parseInt(cells[7]?.textContent.trim()) || 0,
+        insha: parseInt(cells[8]?.textContent.trim()) || 0,
+        kiswa: parseInt(cells[9]?.textContent.trim()) || 0,
+        kiswaLevel: cells[10]?.textContent.trim() || "-",
+        math: parseInt(cells[11]?.textContent.trim()) || 0,
+        mathLevel: cells[12]?.textContent.trim() || "-",
+        scie: parseInt(cells[13]?.textContent.trim()) || 0,
+        scieLevel: cells[14]?.textContent.trim() || "-",
+        sst: parseInt(cells[15]?.textContent.trim()) || 0,
+        sstLevel: cells[16]?.textContent.trim() || "-",
+        agric: parseInt(cells[17]?.textContent.trim()) || 0,
+        agricLevel: cells[18]?.textContent.trim() || "-",
+        cre: parseInt(cells[19]?.textContent.trim()) || 0,
+        creLevel: cells[20]?.textContent.trim() || "-",
+        c_a: parseInt(cells[21]?.textContent.trim()) || 0,
+        c_aLevel: cells[22]?.textContent.trim() || "-",
+        totalMarks: parseInt(cells[23]?.textContent.trim()) || 0
+    };
+});
+
 
     // Group marks by gender
     const genderPerformance = { Male: [], Female: [] };
@@ -6331,129 +6344,157 @@ function generateGenderPerformance() {
     genderPerformance.Male.sort((a, b) => b.totalMarks - a.totalMarks);
     genderPerformance.Female.sort((a, b) => b.totalMarks - a.totalMarks);
 
-    // Function to calculate correct totals and averages
+    // Function to calculate totals and averages (excluding levels)
     function calculateSubjectStats(data) {
-        let totals = {
-            english: 0, math: 0, kiswahili: 0, science: 0,
-            social: 0, agriculture: 0, religion: 0, art: 0, totalMarks: 0
-        };
+        let subjects = ["gram", "comp", "eng", "lugha", "insha", "kiswa", "math", "scie", "sst", "agric", "cre", "c_a", "totalMarks"];
+        let totals = {};
+        let averages = {};
+
+        subjects.forEach(subject => totals[subject] = 0);
 
         data.forEach(entry => {
-            totals.english += entry.english;
-            totals.math += entry.math;
-       
-            totals.kiswahili += entry.kiswahili;
-            totals.science += entry.science;
-            totals.social += entry.social;
-            totals.agriculture += entry.agriculture;
-            totals.religion += entry.religion;
-            totals.art += entry.art;
-            totals.totalMarks += entry.totalMarks;
+            subjects.forEach(subject => totals[subject] += entry[subject]);
         });
 
         let count = data.length;
-        let averages = count > 0 ? {
-            english: (totals.english / count).toFixed(1),
-            math: (totals.math / count).toFixed(1),
-           
-            kiswahili: (totals.kiswahili / count).toFixed(1),
-            science: (totals.science / count).toFixed(1),
-            social: (totals.social / count).toFixed(1),
-            agriculture: (totals.agriculture / count).toFixed(1),
-            religion: (totals.religion / count).toFixed(1),
-            art: (totals.art / count).toFixed(1),
-            totalMarks: (totals.totalMarks / count).toFixed(1)
-        } : totals;
+        subjects.forEach(subject => {
+            averages[subject] = count > 0 ? (totals[subject] / count).toFixed(1) : 0;
+        });
 
         return { totals, averages };
     }
+// Function to generate performance tables
+function createPerformanceTable(data, gender) {
+    if (data.length === 0) return `<h3>No ${gender} learners with recorded marks.</h3>`;
 
-    // Function to generate performance tables
-    function createPerformanceTable(data, gender) {
-        if (data.length === 0) return `<h3>No ${gender} learners with recorded marks.</h3>`;
+    let { totals, averages } = calculateSubjectStats(data);
+    let tableId = `genderPerformanceTable_${gender}`;
 
-        let { totals, averages } = calculateSubjectStats(data);
-
-        let tableHtml = `
-            <h2 style="color: ${gender === "Male" ? "blue" : "purple"}; text-align: center;">
-                ${gender} Performance Report
-            </h2>
+    let tableHtml = `
+        <h2 style="color: ${gender === "Male" ? "blue" : "purple"}; text-align: center;">
+            ${gender} Performance Report
+        </h2>
+        <div id="${tableId}">
             <table border="1" style="width:100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background: #4CAF50; color: white;">
-                        <th>Name</th><th>Grade</th>
-                        <th>English</th><th>Level</th><th>Math</th><th>Level</th>
-                        </th><th>Kiswahili</th><th>Level</th>
-                        <th>Science</th><th>Level</th><th>Social</th><th>Level</th>
-                        <th>Agriculture</th><th>Level</th><th>Religion</th><th>Level</th>
-                        <th>Creative Art</th><th>Level</th><th>Total Marks</th>
+                        <th>No.</th><th>Name</th><th>Grade</th><th>Gram</th><th>Comp</th>
+                        <th>Eng</th><th>Lev</th><th>Lugha</th><th>Insha</th><th>Kiswa</th><th>Lev</th>
+                        <th>Math</th><th>Lev</th><th>Scie</th><th>Lev</th><th>Sst</th><th>Lev</th>
+                        <th>Agric</th><th>Lev</th><th>Cre</th><th>Lev</th><th>C/A</th><th>Lev</th>
+                        <th>Total Marks</th>
                     </tr>
                 </thead>
                 <tbody>
-        `;
-
-        data.forEach(entry => {
-            tableHtml += `
-                <tr>
-                    <td>${entry.learner}</td><td>${entry.grade}</td>
-                    <td>${entry.english}</td><td>${entry.englishLevel}</td>
-                    <td>${entry.math}</td><td>${entry.mathLevel}</td>
-                    <td>${entry.kiswahili}</td><td>${entry.kiswahiliLevel}</td>
-                    <td>${entry.science}</td><td>${entry.scienceLevel}</td>
-                    <td>${entry.social}</td><td>${entry.socialLevel}</td>
-                    <td>${entry.agriculture}</td><td>${entry.agricultureLevel}</td>
-                    <td>${entry.religion}</td><td>${entry.religionLevel}</td>
-                    <td>${entry.art}</td><td>${entry.artLevel}</td>
-                    <td><strong>${entry.totalMarks}</strong></td>
-                </tr>
-            `;
-        });
-
-       // Add totals row
-tableHtml += `
-    <tr style="background: yellow; font-weight: bold;">
-        <td colspan="2">Totals</td>
-        <td>${totals.english}</td><td>-</td>
-        <td>${totals.math}</td><td>-</td>
-    
-        <td>${totals.kiswahili}</td><td>-</td>
-        <td>${totals.science}</td><td>-</td>
-        <td>${totals.social}</td><td>-</td>
-        <td>${totals.agriculture}</td><td>-</td>
-        <td>${totals.religion}</td><td>-</td>
-        <td>${totals.art}</td><td>-</td>
-        <td><strong>${totals.totalMarks}</strong></td>
-    </tr>
-`;
-
-// Add averages row
-tableHtml += `
-    <tr style="background: lightblue; font-weight: bold;">
-        <td colspan="2">Averages</td>
-        <td>${averages.english}</td><td>-</td>
-        <td>${averages.math}</td><td>-</td>
-        
-        <td>${averages.kiswahili}</td><td>-</td>
-        <td>${averages.science}</td><td>-</td>
-        <td>${averages.social}</td><td>-</td>
-        <td>${averages.agriculture}</td><td>-</td>
-        <td>${averages.religion}</td><td>-</td>
-        <td>${averages.art}</td><td>-</td>
-        <td><strong>${averages.totalMarks}</strong></td>
-    </tr>
-`;
-
-tableHtml += `</tbody></table><br><br>`;
-return tableHtml;
-
-    }
-
-    document.getElementById("report").innerHTML = `
-        ${createPerformanceTable(genderPerformance.Male, "Male")}
-        ${createPerformanceTable(genderPerformance.Female, "Female")}
     `;
+
+    data.forEach((entry, index) => {
+        tableHtml += `
+            <tr>
+                <td>${index + 1}</td><td>${entry.learner}</td><td>${entry.grade}</td><td>${entry.gram}</td><td>${entry.comp}</td>
+                <td>${entry.eng}</td><td>${entry.engLevel}</td><td>${entry.lugha}</td><td>${entry.insha}</td>
+                <td>${entry.kiswa}</td><td>${entry.kiswaLevel}</td><td>${entry.math}</td><td>${entry.mathLevel}</td>
+                <td>${entry.scie}</td><td>${entry.scieLevel}</td><td>${entry.sst}</td><td>${entry.sstLevel}</td>
+                <td>${entry.agric}</td><td>${entry.agricLevel}</td><td>${entry.cre}</td><td>${entry.creLevel}</td>
+                <td>${entry.c_a}</td><td>${entry.c_aLevel}</td><td><strong>${entry.totalMarks}</strong></td>
+            </tr>
+        `;
+    });
+
+    // Totals and Averages Rows (Levels removed)
+    tableHtml += `
+        <tr style="background: yellow; font-weight: bold;">
+            <td colspan="3">Totals</td>
+            <td>${totals.gram}</td><td>${totals.comp}</td><td>${totals.eng}</td><td>-</td>
+            <td>${totals.lugha}</td><td>${totals.insha}</td><td>${totals.kiswa}</td><td>-</td>
+            <td>${totals.math}</td><td>-</td><td>${totals.scie}</td><td>-</td>
+            <td>${totals.sst}</td><td>-</td><td>${totals.agric}</td><td>-</td>
+            <td>${totals.cre}</td><td>-</td><td>${totals.c_a}</td><td>-</td>
+            <td><strong>${totals.totalMarks}</strong></td>
+        </tr>
+        <tr style="background: lightblue; font-weight: bold;">
+            <td colspan="3">Averages</td>
+            <td>${averages.gram}</td><td>${averages.comp}</td><td>${averages.eng}</td><td>-</td>
+            <td>${averages.lugha}</td><td>${averages.insha}</td><td>${averages.kiswa}</td><td>-</td>
+            <td>${averages.math}</td><td>-</td><td>${averages.scie}</td><td>-</td>
+            <td>${averages.sst}</td><td>-</td><td>${averages.agric}</td><td>-</td>
+            <td>${averages.cre}</td><td>-</td><td>${averages.c_a}</td><td>-</td>
+            <td><strong>${averages.totalMarks}</strong></td>
+        </tr>
+    `;
+
+    // Add separate print buttons for each gender
+    tableHtml += `</tbody></table><br>
+        <button onclick="printGenderPerformance('${tableId}', '${gender}')" style="padding: 10px; background: green; color: white; border: none; cursor: pointer; border-radius: 5px;">
+            Print ${gender} Performance
+        </button><br><br>
+    `;
+
+    return tableHtml;
 }
 
+// Generate performance reports for each gender separately
+document.getElementById("report").innerHTML = 
+    createPerformanceTable(genderPerformance.Male, "Male") + 
+    createPerformanceTable(genderPerformance.Female, "Female");
+}
+function printGenderPerformance(tableId, gender) {
+    let tableElement = document.getElementById(tableId);
+
+    if (!tableElement) {
+        alert("Table not found!");
+        return;
+    }
+
+    let tableContent = tableElement.outerHTML;
+    let printWindow = window.open('', '', 'width=900,height=600');
+
+    // Get current year dynamically
+    let currentYear = new Date().getFullYear();
+
+    // Extract the grade dynamically from the first learner row
+    let grade = tableElement.querySelector("tbody tr td:nth-child(3)")?.textContent || "Unknown";
+
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print ${gender} Performance Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; color: black; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; color: black; }
+                th, td { border: 1px solid black; padding: 8px; text-align: center; color: black; }
+                th { background: #D3D3D3; color: black; }
+                h1, h2, h3 { font-size: 18px; font-weight: bold; margin: 5px; color: black; }
+                .header-section { text-align: center; margin-bottom: 20px; }
+                .school-logo { width: 100px; height: 100px; margin-bottom: 10px; }
+                @media print {
+                    body * { visibility: hidden; }
+                    .print-container, .print-container * { visibility: visible; }
+                    .print-container { position: absolute; left: 0; top: 0; width: 100%; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="print-container">
+                <div class="header-section">
+                    <img src="school-logo.png" alt="School Logo" class="school-logo"><br>
+                    <h1>NACHU PRIMARY SCHOOL GENDER PERFORMANCE REPORT</h1>
+                    <h2>ADDRESS: P.O BOX 561-00902 KIKUYU, KENYA</h2>
+                    <h3>Phone: +254-700-123456</h3>
+                    <h3>School Motto: "HARD WORK PAYS"</h3>
+                    <h3>Year: ${currentYear}</h3>
+                    <h3>Grade: ${grade}</h3>
+                    <h3>${gender} Performance Report</h3>
+                </div>
+                ${tableContent}
+            </div>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.print();
+}
 
 document.getElementById('photoInput').addEventListener('change', function (event) {
     const files = event.target.files;
@@ -7475,9 +7516,8 @@ document.getElementById("learnerSelect").addEventListener("change", function () 
     };
 });
 
-
-function calculateSubjectLevels() {
-    let subjects = ["kiswahili", "math", "science", "sst", "agriculture", "cre", "ca"]; // Subjects in the given order
+function calculateSubjectLevels() { 
+    let subjects = ["English", "Kiswahili", "Math", "Science", "SST", "Agriculture", "CRE", "CA"]; // Ensure exact subject names match table headers
     let subjectLevels = {};
 
     // Initialize level counters for each subject
@@ -7493,18 +7533,39 @@ function calculateSubjectLevels() {
         return;
     }
 
+    // DEBUG: Check number of rows found in marks table
+    console.log(`Found ${marksRows.length} rows in the marks table.`);
+
+    // Corrected subject level indexes based on extracted table
+    let subjectLevelIndexes = {
+        "English": 6,  
+        "Kiswahili": 10,  
+        "Math": 12,
+        "Science": 14,
+        "SST": 16,
+        "Agriculture": 18,
+        "CRE": 20,
+        "CA": 22
+    };
+
     // Process each row in the marks table
     marksRows.forEach(row => {
         let cells = row.querySelectorAll("td");
 
-        subjects.forEach((subject, index) => {
-            let levelCellIndex = (index * 2) + 2; // Adjust index to target the correct "Lev" columns
+        subjects.forEach(subject => {
+            let levelCellIndex = subjectLevelIndexes[subject]; // Use correct index
+
+            // DEBUG: Log subject and expected column index
+            console.log(`Processing ${subject} at column index ${levelCellIndex}`);
 
             if (levelCellIndex < cells.length) {
                 let levelText = cells[levelCellIndex]?.innerText.trim(); // Extract level text
 
+                // DEBUG: Log extracted level text
+                console.log(`Extracted Level for ${subject}:`, levelText);
+
                 if (levelText) {
-                    let level = parseInt(levelText, 10); // Convert to a number
+                    let level = parseInt(levelText, 10); // Convert to number
 
                     // Count learners for each level
                     if (level === 1) {
@@ -7535,9 +7596,12 @@ function calculateSubjectLevels() {
         </tr>`;
         subjectLevelsTable.innerHTML += row;
     });
+
+    // DEBUG: Log final subject level counts
+    console.log("Final Subject Levels:", subjectLevels);
 }
 
-// Call function after marks are loaded
+// Ensure function runs on page load
 document.addEventListener("DOMContentLoaded", function () {
     calculateSubjectLevels();
 });
@@ -7546,7 +7610,6 @@ document.addEventListener("DOMContentLoaded", function () {
 function refreshLevels() {
     calculateSubjectLevels();
 }
-
 function printSubjectLevels() {
     const subjectTable = document.getElementById("subjectLevels");
     if (!subjectTable) {
@@ -7606,6 +7669,7 @@ function printSubjectLevels() {
     newWindow.document.write(printContents);
     newWindow.document.close();
 }
+
 function groupLearnersByPathways() {
     const learnersTable = document.querySelector("#marksTableSection .report-table tbody");
     const learnersRows = Array.from(learnersTable.querySelectorAll("tr"));
@@ -7629,28 +7693,28 @@ function groupLearnersByPathways() {
 
     learnersRows.forEach((row) => {
         const cells = row.querySelectorAll("td");
-        if (cells.length < 22) return; // Ensure row has enough data
+        if (cells.length < 23) return; // Ensure row has enough data
 
         const learnerName = cells[1].textContent.trim();
         const grade = cells[2].textContent.trim();
 
-        // Extract scores from table cells
+        // Extract scores from table cells using correct indexes
         const scores = {
-            English: parseInt(cells[3].textContent.trim()) || 0,
-            Math: parseInt(cells[5].textContent.trim()) || 0,
-             Kiswahili: parseInt(cells[9].textContent.trim()) || 0,
-            "Integrated Science": parseInt(cells[11].textContent.trim()) || 0,
-            "Social Studies": parseInt(cells[13].textContent.trim()) || 0,
-            Agriculture: parseInt(cells[15].textContent.trim()) || 0,
-            "Religious Education": parseInt(cells[17].textContent.trim()) || 0,
-            "Creative Art": parseInt(cells[19].textContent.trim()) || 0,
+            English: parseInt(cells[5].textContent.trim()) || 0,
+            Kiswahili: parseInt(cells[9].textContent.trim()) || 0,
+            Math: parseInt(cells[11].textContent.trim()) || 0,
+            Science: parseInt(cells[13].textContent.trim()) || 0,
+            SocialStudies: parseInt(cells[15].textContent.trim()) || 0,
+            Agriculture: parseInt(cells[17].textContent.trim()) || 0,
+            CRE: parseInt(cells[19].textContent.trim()) || 0,
+            CreativeArts: parseInt(cells[21].textContent.trim()) || 0,
         };
 
         // Define pathways and their subject associations
         const pathways = {
-            STEM: ["English", "Math", "Kiswahili", "Integrated Science", "Agriculture"],
-            "Social Sciences": ["Kiswahili", "English", "Social Studies", "Religious Education"],
-            "Sports, Arts & Science": ["Kiswahili", "English", "Creative Art"],
+            STEM: ["English", "Kiswahili", "Math", "Science", "Agriculture"],
+            "Social Sciences": ["English", "Kiswahili", "SocialStudies", "CRE"],
+            "Sports, Arts & Science": ["English", "Kiswahili", "CreativeArts"],
         };
 
         const pathwayResults = {};
@@ -7746,9 +7810,9 @@ function printPathwayReport() {
                     <th rowspan="2">Best Pathway</th>
                 </tr>
                 <tr>
-                    <th>ENG</th><th>MATH</th><th>PRE-TECH</th><th>KISWA</th><th>I SCIE</th><th>AGRIC</th>
-                    <th>KISWA</th><th>ENG</th><th>SST</th><th>CRE</th>
-                    <th>KISWA</th><th>ENG</th><th>C/A</th>
+                    <th>ENG</th><th>KISWA</th><th>MATH</th><th>SCIENCE</th><th>AGRIC</th>
+                    <th>ENG</th><th>KISWA</th><th>SST</th><th>CRE</th>
+                    <th>ENG</th><th>KISWA</th><th>C/A</th>
                 </tr>
             </thead>
             <tbody>${document.querySelector("#pathwaysResultsTable tbody").innerHTML}</tbody>
@@ -7760,18 +7824,18 @@ function printPathwayReport() {
 
     // Combine header, main table, and summary table into the final report content
     const reportContent = `
-        <div style="text-align: center; font-family: Arial, sans-serif;">
+        <div style="text-align: center; font-family: Arial, sans-serif; color: black;">
             <img src="https://i.imgur.com/uWrz8rt.png" alt="School Logo" style="max-width: 100px; display: block; margin: 0 auto;">
-            <h2 style="margin: 5px 0;">NACHU PRIMARY SCHOOL Pathway Report</h2>
-            <p>561-00902 Kikuyu KENYA </p>
-            <p>Phone: +254-700-123456</p>
-            <p style="font-style: italic; font-weight: bold;">School Motto: "Excellence Through Knowledge"</p>
-            <p><strong>Year: 2025</strong></p>
+            <h2 style="margin: 5px 0; font-size: 18px;"><b>NACHU PRIMARY SCHOOL PATHWAY REPORT</b></h2>
+            <p><b>ADDRESS: PO BOX 561-00902 KIKUYU, KENYA</b></p>
+            <p><b>Phone: +254-700-123456</b></p>
+            <p style="font-style: italic; font-weight: bold; font-size: 18px;">School Motto: "HARD WORK PAYS"</p>
+            <p><b>Year: ${new Date().getFullYear()}</b></p>
         </div>
         <hr>
         ${mainTableHTML}
         <br>
-        <h3 style="text-align: center;">Pathway Summary</h3>
+        <h3 style="text-align: center; font-size: 18px;">Pathway Summary</h3>
         ${summaryTableHTML}
     `;
 
@@ -7782,10 +7846,11 @@ function printPathwayReport() {
         <head>
             <title>Career Pathway Report</title>
             <style>
-                body { font-family: Arial, sans-serif; text-align: center; }
+                body { font-family: Arial, sans-serif; text-align: center; color: black; }
                 table { width: 100%; border-collapse: collapse; margin-top: 10px; }
                 th, td { border: 1px solid black; padding: 5px; }
-                th { background-color: #f2f2f2; }
+                th { background-color: #f2f2f2; font-size: 16px; }
+                p, h2, h3 { margin: 5px 0; font-size: 18px; font-weight: bold; }
             </style>
         </head>
         <body>
