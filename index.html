@@ -1014,17 +1014,10 @@ button {
 <button class="btn-actions" onclick="toggleSection('juniorSchoolActions')">
     <span class="material-icons">school</span> Assessment Actions
 </button>
-<button class="btn-purple" onclick="toggleSection('championsForm')">
-    <span class="material-icons" style="color: #9b59b6;">admin_panel_settings</span> Admin Details
-</button>
 
 <!-- Menu Button -->
 <button id="menuToggle" class="btn-toggle" onclick="toggleSection('menuActions')">
     <span class="material-icons" style="color: #3498db;">group</span> Manage Staff
-</button>
-
-<button id="logoutButton" onclick="logout()" style="background-color: #e74c3c; color: white; border: none; padding: 10px 15px; font-size: 16px; cursor: pointer; border-radius: 5px;">
-    <i class="fas fa-sign-out-alt" style="color: #fff; margin-right: 5px;"></i> Logout
 </button>
 
 <!-- Button to Show/Hide Fee Management Menu -->
@@ -1286,16 +1279,22 @@ button {
   style="padding: 10px; background: red; color: white; border: none; cursor: pointer; border-radius: 5px;">
   <i class="fas fa-trash-alt"></i> Delete All Fee Records
 </button>
-<!-- Button to Show Learner Count -->
-<button onclick="openOnlyOneSection('learnerCountContainer')" 
-  style="background: #4CAF50; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
-  <i class="fas fa-users"></i> Show Learner Count Per Grade
+<!-- Toggle Button -->
+<button id="toggleLearnerCountBtn" onclick="toggleLearnerCountTable()" style="padding: 10px; background-color: #1976D2; color: white; border: none; border-radius: 5px; cursor: pointer;">
+  <i class="fas fa-table"></i> Show Learner Count
 </button>
 
- 
-   </div>
+<!-- Learner Count Table Container -->
+<div id="learnerCountContainer" style="display: none; margin-top: 20px;"></div>
 
-    </div>
+<!-- Print Button -->
+<div style="text-align: center; margin-top: 10px;">
+  <button onclick="printLearnerCountTable()" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    <i class="fas fa-print"></i> Print Learner Count
+  </button>
+</div>
+
+  
    <!-- Archived Fees Container -->
 <div id="archivedFeesContainer" style="display: none; text-align: left; background: #f0f0f0; padding: 15px; border-radius: 5px; margin-top: 20px;">
   <h2 style="color: #4CAF50;">Archived Fee Records</h2>
@@ -1589,17 +1588,11 @@ button {
 </button> 
 
 <div class="dropdown" id="registrationMenu">
-  <button onclick="toggleSection('parentRegistrationSection')" class="neon-button" style="width: 90px; padding: 10px;">
-    <i class="fas fa-user-plus"></i> Register Parent
-  </button>
   <button onclick="toggleSection('staffRegistrationSection')" class="neon-button" style="width: 90px; padding: 10px;">
     <i class="fas fa-chalkboard-teacher"></i> Register Staff
   </button>
   <button onclick="toggleRegisterSupportStaff()" class="neon-button">
     <i class="fas fa-users-cog"></i> Register Support Staff
-  </button>
-  <button onclick="toggleSection('registeredParentsSection')" class="neon-button" style="width: 90px; padding: 10px;">
-    <i class="fas fa-users"></i> View Parents
   </button>
   <button onclick="toggleSection('registeredStaffSection')" class="neon-button" style="width: 90px; padding: 10px;">
     <i class="fas fa-users"></i> View Staff
@@ -1671,7 +1664,31 @@ button {
 <button onclick="printRegisteredLearners()" class="neon-button">
     <i class="fas fa-print" style="color: #2ecc71;"></i> Print Registered Learners
 </button>
+<h3>Parent Contact List by Grade</h3>
 
+<label for="gradeFilterDropdown">Select Grade:</label>
+<select id="gradeFilterDropdown" onchange="filterParentInfoByGrade()">
+  <option value="">-- All Grades --</option>
+</select>
+
+<button onclick="printParentInfoTable()">
+    <span class="material-icons">print</span> Print Table
+</button>
+
+
+<table id="parentInfoTable" border="1" style="margin-top: 10px; display: none;">
+  <thead>
+    <tr>
+    <th>Number</th>
+<th>Parent Name</th>
+<th>Phone Number</th>
+<th>Grade</th>
+<th>Signature</th>
+
+    </tr>
+  </thead>
+  <tbody id="parentInfoBody"></tbody>
+</table>
 <button onclick="groupLearnersByGrade()" class="neon-button">
     <i class="fas fa-users" style="color: #3498db;"></i> Group by Grade
 </button>
@@ -1693,16 +1710,35 @@ button {
     <i class="fas fa-print" style="color: #2ecc71;"></i> Print Grouped by Gender
 </button>
 
-<!-- Button to Toggle Learners Count --> 
-<button id="toggleLearnersCountButton" onclick="toggleLearnersCount()" class="neon-button">
-    <i class="fas fa-eye" style="color: #f1c40f;"></i> Show Learners Count
-</button>
+<div style="margin-top: 20px;">
+  <label for="gradeDropdown"><strong>Select Grade:</strong></label>
+  <select id="gradeDropdown" onchange="showLearnerNamesOnly()" style="margin-left: 10px;">
+    <option value="">-- Select Grade --</option>
+  </select>
 
-<!-- Button to Print Learners Count -->
-<button onclick="printLearnersCount()" class="neon-button orange-neon">
-    <i class="fas fa-print" style="color: #e74c3c;"></i> Print Learners Count
-</button>
+  <button onclick="printLearnersTable()" style="margin-left: 15px; padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    <i class="fas fa-print"></i> Print
+  </button>
 
+  <!-- Printable Section -->
+  <div id="printableLearnersTable" style="margin-top: 20px;">
+    <div id="printHeader" style="text-align: center; margin-bottom: 15px;">
+      <img src="https://i.imgur.com/uWrz8rt.png" alt="School Logo" style="max-height: 80px;"><br>
+      <h2 style="margin: 5px 0; color: black;">NACHU PRIMARY   SCHOOL</h2>
+      <h3 style="margin: 5px 0; color: black;">Learner List - <span id="selectedGradeHeader"></span></h3>
+    </div>
+
+    <table id="learnersNameTable" style="border-collapse: collapse; width: 100%; color: black;">
+      <thead>
+        <tr style="background-color: #4CAF50; color: white;">
+          <th style="border: 1px solid black; padding: 8px;">No</th>
+          <th style="border: 1px solid black; padding: 8px;">Name</th>
+        </tr>
+      </thead>
+      <tbody id="learnerNamesList"></tbody>
+    </table>
+  </div>
+</div>
   
     <button class="neon-button btn-red" onclick="viewArchives()">
         <span class="material-icons" style="color: #d32f2f;">archive</span> View Archived Exams
@@ -1873,13 +1909,25 @@ button {
 <button onclick="deleteMarksTable()" style="background: red; color: white; padding: 10px; border-radius: 5px; font-weight: bold;">
     <i class="fas fa-trash"></i> Delete Marks Table
 </button>
-
-<button onclick="printMarksTable()" style="background: green; color: white; padding: 10px; border-radius: 5px; font-weight: bold; margin-left: 10px;">
-    <i class="fas fa-print"></i> Print Merit 
+<button id="toggleMarksStatusBtn" onclick="toggleMarksStatus()" style="background: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">
+  <i class="fas fa-chart-bar"></i>  Marks Recording Summary
 </button>
+<div id="marksStatusWrapper" style="margin-top: 20px;"></div>
+
  <div style="background-color: #ffeb3b; color: #000; padding: 10px; border-radius: 5px; font-weight: bold; display: flex; align-items: center;">
     <i class="fas fa-bullhorn" style="color: #d32f2f; font-size: 24px; margin-right: 8px;"></i> 
     Kindly generate all reports before deleting this merit list.
+<div style="margin-bottom: 10px;">
+  <label for="gradeSelect"><strong>Filter by Grade:</strong></label>
+  <select id="gradeSelect" onchange="filterMarksByGrade()">
+    <option value="">All Grades</option>
+  </select>
+</div>
+<div style="margin-top: 15px;">
+  <button onclick="printFilteredGrades()" style="padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    <i class="fas fa-print"></i> Print Filtered Grades
+  </button>
+</div>
 </div>
 
        <th>No.</th> <!-- Serial Number --> 
@@ -1899,6 +1947,8 @@ button {
             <th>Cre</th><th>Lev</th>
             <th>C/A</th><th>Lev</th>
             <th>Total Marks</th>
+
+            <th>Perform</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -1998,9 +2048,7 @@ button {
     <i class="fas fa-venus-mars" style="color: #d35400;"></i> Generate Gender Merit List
   </button>
 
-  <button onclick="togglePathwaysTable()" class="button toggle-button">
-    <i class="fas fa-project-diagram" style="color: #16a085;"></i> Group Learners by Pathways
-  </button>
+  
 <!-- Merit List Control Buttons -->
 <button onclick="generateMeritList()" class="neon-button btn-ranking">
     <i class="fas fa-chart-line" style="color: #f39c12;"></i> Get Merit List
@@ -2017,7 +2065,9 @@ button {
  <button onclick="hideGeneratedReports()" class="neon-button btn-red circle-button">
     <i class="fas fa-arrow-left" style="color: #c0392b;"></i> Back
   </button>
-
+<button onclick="toggleSection('championsForm')" class="neon-button btn-toggle">
+    <span class="material-icons" style="color: #e74c3c;">admin_panel_settings</span> Admin Details
+</button>
 <!-- Merit List Selection -->
 <label for="gradeSelect" style="font-size: 14px; font-weight: bold; color: #4CAF50;">
     <i class="fas fa-list-ol"></i> <strong>Merit List Here:</strong>
@@ -2748,7 +2798,6 @@ function saveMarksToStorage() {
 function showAlert(message) {
     alert(message); // Simple alert for demonstration
 }
-
 function updateLearnersTable() { 
     learnersList.innerHTML = learners.map((learner, index) => `
         <tr>
@@ -2767,7 +2816,8 @@ function updateLearnersTable() {
         </tr>
     `).join("");
 
-    updateLearnerSelect(); // Update dropdown or related components
+    updateLearnerSelect();      // Existing dropdown or UI update
+    populateGradeDropdown();    // ? Dynamically fill the grade <select> based on learners
 }
 
 function toggleChampionsForm() {
@@ -3519,108 +3569,6 @@ function saveGroupedChanges(grade) {
     localStorage.setItem('learners', JSON.stringify(learners));
     alert(`Changes for Grade ${grade} have been saved successfully.`);
 }
-function updateMarksTable() {
-    // Sort marks by totalMarks in descending order
-    marks.sort((a, b) => b.totalMarks - a.totalMarks);
-
-    let subjectTotals = Array(12).fill(0); // Ensure correct subject count
-    let totalMarksSum = 0; // Accumulate total marks
-
-    marksList.innerHTML = marks.map((mark, index) => {
-        // Compute total marks **excluding English Language, Composition, Kiswahili Lugha, and Insha**
-        mark.totalMarks = mark.scores[2] + mark.scores[5] + mark.scores[6] + mark.scores[8] +
-                          mark.scores[9] + mark.scores[10] + mark.scores[11] + mark.scores[12];
-
-        // Update totals for each subject
-        mark.scores.forEach((score, idx) => {
-            if (![0, 1, 3, 4].includes(idx)) { // Skip Eng Lang, Composition, Kisw Lang, Insha
-                subjectTotals[idx] += score;
-            }
-        });
-
-        totalMarksSum += mark.totalMarks;
-
-        return `
-            <tr>
-                <td>${index + 1}</td> <!-- Row Number -->
-                <td>${mark.learner}</td>
-                <td>${mark.grade}</td>
-
-                <!-- English Language, Composition (No Levels) -->
-                <td>${mark.scores[0]}</td>
-                <td>${mark.scores[1]}</td>
-
-                <!-- Eng (With Level) -->
-                <td>${mark.scores[2]}</td><td>${getLevel(mark.scores[2])}</td>
-
-                <!-- Kiswahili Language, Insha (No Levels) -->
-                <td>${mark.scores[3]}</td>
-                <td>${mark.scores[4]}</td>
-
-                <!-- Kiswahili (With Level) -->
-                <td>${mark.scores[5]}</td><td>${getLevel(mark.scores[5])}</td>
-
-                <!-- Mathematics (With Level) -->
-                <td>${mark.scores[6]}</td><td>${getLevel(mark.scores[6])}</td>
-
-                <!-- Science, Social Studies, Agriculture, Religious Ed, Creative Art (With Level) -->
-                <td>${mark.scores[8]}</td><td>${getLevel(mark.scores[8])}</td>
-                <td>${mark.scores[9]}</td><td>${getLevel(mark.scores[9])}</td>
-                <td>${mark.scores[10]}</td><td>${getLevel(mark.scores[10])}</td>
-                <td>${mark.scores[11]}</td><td>${getLevel(mark.scores[11])}</td>
-                <td>${mark.scores[12]}</td><td>${getLevel(mark.scores[12])}</td>
-
-                <td style="font-weight:bold; border: 2px solid black;">${mark.totalMarks}</td>
-                <td>
-                    <button onclick="deleteMarks(${index})" class="circle-button"><i class="fas fa-trash-alt"></i> Del</button>
-                </td>
-            </tr>
-        `;
-    }).join("");
-
-    // Calculate averages and add totals to the table
-    const averages = subjectTotals.map(total => (marks.length > 0 ? (total / marks.length).toFixed(2) : 0));
-
-    const totalRow = `
-        <tr>
-            <td colspan="3" style="font-weight:bold;">Total</td>
-            <td style="font-weight:bold;">${subjectTotals[0]}</td>
-            <td style="font-weight:bold;">${subjectTotals[1]}</td>
-            <td style="font-weight:bold;">${subjectTotals[2]}</td><td></td>
-            <td style="font-weight:bold;">${subjectTotals[3]}</td>
-            <td style="font-weight:bold;">${subjectTotals[4]}</td>
-            <td style="font-weight:bold;">${subjectTotals[5]}</td><td></td>
-            <td style="font-weight:bold;">${subjectTotals[6]}</td><td></td>
-            <td style="font-weight:bold;">${subjectTotals[7]}</td><td></td>
-            <td style="font-weight:bold;">${subjectTotals[8]}</td><td></td>
-            <td style="font-weight:bold;">${subjectTotals[9]}</td><td></td>
-            <td style="font-weight:bold;">${subjectTotals[10]}</td><td></td>
-            <td style="font-weight:bold;">${subjectTotals[11]}</td><td></td>
-            <td style="font-weight:bold;">${subjectTotals[12]}</td><td></td>
-            <td style="font-weight:bold;">${totalMarksSum}</td>
-        </tr>`;
-
-    const averageRow = `
-        <tr>
-            <td colspan="3" style="font-weight:bold;">Average</td>
-            <td style="font-weight:bold;">${averages[0]}</td>
-            <td style="font-weight:bold;">${averages[1]}</td>
-            <td style="font-weight:bold;">${averages[2]}</td><td></td>
-            <td style="font-weight:bold;">${averages[3]}</td>
-            <td style="font-weight:bold;">${averages[4]}</td>
-            <td style="font-weight:bold;">${averages[5]}</td><td></td>
-            <td style="font-weight:bold;">${averages[6]}</td><td></td>
-            <td style="font-weight:bold;">${averages[7]}</td><td></td>
-            <td style="font-weight:bold;">${averages[8]}</td><td></td>
-            <td style="font-weight:bold;">${averages[9]}</td><td></td>
-            <td style="font-weight:bold;">${averages[10]}</td><td></td>
-            <td style="font-weight:bold;">${averages[11]}</td><td></td>
-            <td style="font-weight:bold;">${averages[12]}</td><td></td>
-            <td style="font-weight:bold;">${(marks.length > 0 ? (totalMarksSum / marks.length).toFixed(2) : 0)}</td>
-        </tr>`;
-
-    marksList.innerHTML += totalRow + averageRow;
-}
 
 // Delete a mark entry
 function deleteMarks(index) {
@@ -4176,157 +4124,296 @@ function removeLearner(index) {
     updateLearnersTable(); // Update the table after deletion
     localStorage.setItem('learners', JSON.stringify(learners)); // Save the updated list to local storage
 }
-function showSubjectPerformance() { 
-    const subjectScores = {};
+function showSubjectPerformance() {
+    // Create custom prompt overlay
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "1000";
 
-    // Define only the required 8 subjects, skipping Grammar, Composition, Lugha, and Insha
-    const subjects = [
-        "English", "Kiswahili", "Mathematics",  
-        "Science", "Social Studies", 
-        "Agriculture", "Religious Education", "Creative Arts"
-    ];
+    const promptBox = document.createElement("div");
+    promptBox.style.background = "#fff";
+    promptBox.style.padding = "20px";
+    promptBox.style.borderRadius = "8px";
+    promptBox.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+    promptBox.style.textAlign = "center";
+    promptBox.innerHTML = `
+        <h3 style="margin-top: 0; color: #333;">Enter Grade</h3>
+        <input type="text" id="gradeInput" placeholder="e.g., Grade 4A" style="padding: 8px; width: 80%; border: 1px solid #ccc; border-radius: 4px;"><br><br>
+        <button id="submitGrade" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Submit</button>
+        <button id="cancelPrompt" style="padding: 8px 16px; margin-left: 10px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+    `;
 
-    // Map actual indices of subjects (skipping Gram, Comp, Lugha, Insha)
-    const subjectIndexes = [2, 5, 6, 7, 8, 9, 10, 11]; 
+    overlay.appendChild(promptBox);
+    document.body.appendChild(overlay);
 
-    // Initialize subject tracking
-    subjects.forEach(subject => {
-        subjectScores[subject] = { total: 0, count: 0 };
-    });
+    document.getElementById("submitGrade").onclick = () => {
+        const selectedGrade = document.getElementById("gradeInput").value.trim();
+        if (!selectedGrade) {
+            alertInline("No grade entered. Operation cancelled.");
+            document.body.removeChild(overlay);
+            return;
+        }
 
-    marks.forEach(mark => {
-        subjects.forEach((subject, idx) => {
-            let actualIndex = subjectIndexes[idx]; // Get the correct index from scores
-            let score = mark.scores[actualIndex] || 0; // Fetch score using the mapped index
+        document.body.removeChild(overlay);
+        generatePerformance(selectedGrade);
+    };
 
-            if (!isNaN(score) && score > 0) { // Ignore invalid values
-                subjectScores[subject].total += score;
-                subjectScores[subject].count++;
-            }
-        });
-    });
+    document.getElementById("cancelPrompt").onclick = () => {
+        document.body.removeChild(overlay);
+    };
 
-    // Function to determine performance level
-    function getPerformanceLevel(score) {
-        if (score >= 0 && score <= 25) return "Level 1 (BE)";
-        if (score >= 26 && score <= 49) return "Level 2 (AE)";
-        if (score >= 50 && score <= 75) return "Level 3 (ME)";
-        if (score >= 76 && score <= 100) return "Level 4 (EE)";
-        return "Invalid Score";
+    function alertInline(message) {
+        const alertDiv = document.createElement("div");
+        alertDiv.textContent = message;
+        alertDiv.style.position = "fixed";
+        alertDiv.style.top = "20px";
+        alertDiv.style.left = "50%";
+        alertDiv.style.transform = "translateX(-50%)";
+        alertDiv.style.backgroundColor = "#f44336";
+        alertDiv.style.color = "#fff";
+        alertDiv.style.padding = "10px 20px";
+        alertDiv.style.borderRadius = "5px";
+        alertDiv.style.zIndex = "1001";
+        alertDiv.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000);
     }
 
-    // Compute means & performance levels
-    const meanScores = Object.keys(subjectScores).map(subject => {
-        const mean = subjectScores[subject].count > 0 
-            ? (subjectScores[subject].total / subjectScores[subject].count).toFixed(2) 
-            : "N/A"; 
-        const level = mean !== "N/A" ? getPerformanceLevel(mean) : "N/A"; 
-        return { subject, mean, level };
-    }).sort((a, b) => b.mean - a.mean);
+    function generatePerformance(selectedGrade) {
+        const subjectScores = {};
+        const subjects = [
+            "English", "Kiswahili", "Mathematics",  
+            "Science", "Social Studies", 
+            "Agriculture", "Religious Education", "Creative Arts"
+        ];
+        const subjectIndexes = [2, 5, 6, 7, 8, 9, 10, 11];
 
-    // Generate performance table
-    let performanceHtml = `<h3 style="color: #4CAF50; text-align: center;">Subject Performance</h3>`;
-    performanceHtml += `<table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Subject</th>
-                                    <th>Mean Score</th>
-                                    <th>Performance Level</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
+        subjects.forEach(subject => {
+            subjectScores[subject] = { total: 0, count: 0 };
+        });
 
-    let number = 1;
-    meanScores.forEach(({ subject, mean, level }) => {
-        performanceHtml += `<tr>
-                                <td>${number++}</td>
-                                <td>${subject}</td>
-                                <td>${mean}</td>
-                                <td>${level}</td>
-                            </tr>`;
-    });
+        marks.forEach(mark => {
+            if (mark.grade !== selectedGrade) return;
 
-    performanceHtml += `</tbody></table>`;
+            subjects.forEach((subject, idx) => {
+                let actualIndex = subjectIndexes[idx];
+                let score = mark.scores[actualIndex] || 0;
 
-    // Display the subject performance report
-    document.getElementById("report").innerHTML = performanceHtml;
+                if (!isNaN(score) && score > 0) {
+                    subjectScores[subject].total += score;
+                    subjectScores[subject].count++;
+                }
+            });
+        });
+
+        function getPerformanceLevel(score) {
+            if (score >= 0 && score <= 25) return "Level 1 (BE)";
+            if (score >= 26 && score <= 49) return "Level 2 (AE)";
+            if (score >= 50 && score <= 75) return "Level 3 (ME)";
+            if (score >= 76 && score <= 100) return "Level 4 (EE)";
+            return "Invalid Score";
+        }
+
+        const meanScores = Object.keys(subjectScores).map(subject => {
+            const mean = subjectScores[subject].count > 0 
+                ? (subjectScores[subject].total / subjectScores[subject].count).toFixed(2) 
+                : "N/A"; 
+            const level = mean !== "N/A" ? getPerformanceLevel(mean) : "N/A"; 
+            return { subject, mean, level };
+        }).sort((a, b) => b.mean - a.mean);
+
+        let performanceHtml = `<h3 style="color: #4CAF50; text-align: center;">Subject Performance - ${selectedGrade}</h3>`;
+        performanceHtml += `<table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Subject</th>
+                                        <th>Mean Score</th>
+                                        <th>Performance Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+        let number = 1;
+        meanScores.forEach(({ subject, mean, level }) => {
+            performanceHtml += `<tr>
+                                    <td>${number++}</td>
+                                    <td>${subject}</td>
+                                    <td>${mean}</td>
+                                    <td>${level}</td>
+                                </tr>`;
+        });
+
+        performanceHtml += `</tbody></table>`;
+        document.getElementById("report").innerHTML = performanceHtml;
+    }
 }
 function showSubjectRanking() {
-    // Define only the required 8 subjects
-    const subjects = [
-        "English", "Kiswahili", "Mathematics",  
-        "Science", "Social Studies", 
-        "Agriculture", "Religious Education", "Creative Arts"
-    ];
+    // Remove any existing prompt
+    const oldPrompt = document.getElementById("customPromptBox");
+    if (oldPrompt) oldPrompt.remove();
 
-    // Map the correct indexes of these subjects (skipping Grammar, Composition, Lugha, and Insha)
-    const subjectIndexes = [2, 5, 6, 7, 8, 9, 10, 11]; 
+    // Create custom prompt overlay
+    const overlay = document.createElement("div");
+    overlay.id = "customPromptBox";
+    overlay.style = `
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
 
-    // Initialize ranking storage
-    const rankings = subjects.reduce((acc, subject) => {
-        acc[subject] = [];
-        return acc;
-    }, {});
+    // Create prompt container
+    const box = document.createElement("div");
+    box.style = `
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        text-align: center;
+        width: 300px;
+        font-family: Arial, sans-serif;
+    `;
 
-    // Process each learner's scores
-    marks.forEach(mark => {
-        subjects.forEach((subject, idx) => {
-            let actualIndex = subjectIndexes[idx]; // Get the correct index from scores
-            let score = mark.scores[actualIndex] || 0; // Fetch score using mapped index
+    box.innerHTML = `
+        <h3 style="margin-bottom: 10px; color: #333;">Enter Report Context</h3>
+        <input type="text" id="promptInput" placeholder="e.g. Grade 4A Term 1" 
+            style="width: 90%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 5px;">
+        <br>
+        <button id="submitPrompt" style="padding: 6px 14px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+    `;
 
-            if (!isNaN(score) && score > 0) { // Ignore invalid values
-                rankings[subject].push({ name: mark.learner, score });
-            }
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    // When submitted
+    document.getElementById("submitPrompt").onclick = function () {
+        const titlePrompt = document.getElementById("promptInput").value.trim();
+        document.body.removeChild(overlay); // Remove prompt
+
+        if (!titlePrompt) {
+            // Custom alert fallback
+            const alertBox = document.createElement("div");
+            alertBox.style = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #f44336;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-family: Arial, sans-serif;
+                z-index: 10000;
+            `;
+            alertBox.innerText = "Please provide a valid title for the ranking report!";
+            document.body.appendChild(alertBox);
+            setTimeout(() => alertBox.remove(), 3000);
+            return;
+        }
+
+        // Now generate the rankings
+        generateSubjectRanking(titlePrompt);
+    };
+
+    function generateSubjectRanking(titlePrompt) {
+        const gradeMarks = marks.filter(mark => mark.grade.toLowerCase() === titlePrompt.toLowerCase());
+
+        if (gradeMarks.length === 0) {
+            document.getElementById("report").innerHTML = `
+                <div style="text-align: center; padding: 20px; color: red;">
+                    <h3>No records found for <strong>${titlePrompt}</strong>.</h3>
+                    <p>Please make sure the grade exists in the marklist.</p>
+                </div>`;
+            return;
+        }
+
+        const subjects = [
+            "English", "Kiswahili", "Mathematics",  
+            "Science", "Social Studies", 
+            "Agriculture", "Religious Education", "Creative Arts"
+        ];
+
+        const subjectIndexes = [2, 5, 6, 7, 8, 9, 10, 11]; 
+
+        const rankings = subjects.reduce((acc, subject) => {
+            acc[subject] = [];
+            return acc;
+        }, {});
+
+        gradeMarks.forEach(mark => {
+            subjects.forEach((subject, idx) => {
+                let actualIndex = subjectIndexes[idx];
+                let score = mark.scores[actualIndex] || 0;
+
+                if (!isNaN(score) && score > 0) {
+                    rankings[subject].push({ name: mark.learner, score });
+                }
+            });
         });
-    });
 
-    // Sort rankings by highest score for each subject
-    for (const subject in rankings) {
-        rankings[subject].sort((a, b) => b.score - a.score);
+        for (const subject in rankings) {
+            rankings[subject].sort((a, b) => b.score - a.score);
+        }
+
+        function getPerformanceLevel(score) {
+            if (score >= 0 && score <= 25) return "Level 1 (BE)";
+            if (score >= 26 && score <= 49) return "Level 2 (AE)";
+            if (score >= 50 && score <= 75) return "Level 3 (ME)";
+            if (score >= 76 && score <= 100) return "Level 4 (EE)";
+            return "Invalid Score";
+        }
+
+        let rankingsHtml = `
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h3 style="color: #4CAF50;">Subject Rankings for ${titlePrompt}</h3>
+                <div style="display: inline-block; padding: 6px 12px; background: #f2f2f2; border-radius: 6px; font-size: 14px; color: #333; margin-bottom: 20px;">
+                    Custom Title: <strong>${titlePrompt}</strong>
+                </div>
+            </div>`;
+
+        for (const subject in rankings) {
+            rankingsHtml += `<h4 style="color: #2E86C1;">${subject}</h4>`;
+            rankingsHtml += `<table class="learners-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Score</th>
+                                        <th>Performance Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+            rankings[subject].forEach((entry, index) => {
+                let level = getPerformanceLevel(entry.score);
+                rankingsHtml += `<tr>
+                                    <td>${index + 1}</td>
+                                    <td>${entry.name}</td>
+                                    <td>${entry.score}</td>
+                                    <td>${level}</td>
+                                </tr>`;
+            });
+
+            rankingsHtml += `</tbody></table>`;
+        }
+
+        document.getElementById("report").innerHTML = rankingsHtml;
     }
-
-    // Function to determine performance level
-    function getPerformanceLevel(score) {
-        if (score >= 0 && score <= 25) return "Level 1 (BE)";
-        if (score >= 26 && score <= 49) return "Level 2 (AE)";
-        if (score >= 50 && score <= 75) return "Level 3 (ME)";
-        if (score >= 76 && score <= 100) return "Level 4 (EE)";
-        return "Invalid Score";
-    }
-
-    // Generate HTML for rankings
-    let rankingsHtml = `<h3 style="color: #4CAF50; text-align: center;">Subject Rankings</h3>`;
-    
-    for (const subject in rankings) {
-        rankingsHtml += `<h4 style="color: #2E86C1;">${subject}</h4>`;
-        rankingsHtml += `<table class="learners-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Name</th>
-                                    <th>Score</th>
-                                    <th>Performance Level</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-
-        rankings[subject].forEach((entry, index) => {
-            let level = getPerformanceLevel(entry.score);
-            rankingsHtml += `<tr>
-                                <td>${index + 1}</td>
-                                <td>${entry.name}</td>
-                                <td>${entry.score}</td>
-                                <td>${level}</td>
-                            </tr>`;
-        });
-
-        rankingsHtml += `</tbody></table>`;
-    }
-
-    // Display rankings in the report section
-    document.getElementById("report").innerHTML = rankingsHtml;
 }
+
+
 
 // Toggle visibility of the Registered Learners box
 function toggleRegisteredLearners() {
@@ -4968,86 +5055,148 @@ function printGroupedTable(grade) {
 
      
         }
- function showSubjectChampions() {
-    // Define the 8 correct subjects
-    const subjects = [
-        'English', 'Mathematics', 'Kiswahili', 'Science', 
-        'Social Studies', 'Agriculture', 'Religious Education', 'Creative Art'
-    ];
+function showSubjectChampions() {
+    // Create custom prompt overlay
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "1000";
 
-    const champions = {};
+    const promptBox = document.createElement("div");
+    promptBox.style.background = "#fff";
+    promptBox.style.padding = "20px";
+    promptBox.style.borderRadius = "8px";
+    promptBox.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+    promptBox.style.textAlign = "center";
+    promptBox.innerHTML = `
+        <h3 style="margin-top: 0; color: #333;">Enter Grade</h3>
+        <input type="text" id="gradeInput" placeholder="e.g., Grade 4A" style="padding: 8px; width: 80%; border: 1px solid #ccc; border-radius: 4px;"><br><br>
+        <button id="submitGrade" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Submit</button>
+        <button id="cancelPrompt" style="padding: 8px 16px; margin-left: 10px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+    `;
 
-    marks.forEach(mark => {
-        mark.scores.forEach((score, index) => {
-            // Skip unwanted subjects (Gram, Comp, Lugha, Insha)
-            const allSubjects = [
-                'Gram', 'Comp', 'English', 'Lugha', 'Insha', 'Kiswahili', 'Mathematics',
-                'Science', 'Social Studies', 'Agriculture', 'Religious Education', 'Creative Art'
-            ];
+    overlay.appendChild(promptBox);
+    document.body.appendChild(overlay);
 
-            const subject = allSubjects[index];
+    document.getElementById("submitGrade").onclick = () => {
+        const selectedGrade = document.getElementById("gradeInput").value.trim();
+        if (!selectedGrade) {
+            alertInline("No grade entered. Operation cancelled.");
+            document.body.removeChild(overlay);
+            return;
+        }
 
-            // Only process the 8 main subjects and ignore unwanted ones
-            if (subjects.includes(subject)) {
-                if (!champions[subject] || score > champions[subject].score) {
-                    champions[subject] = { name: mark.learner, score };
-                }
-            }
-        });
-    });
+        document.body.removeChild(overlay);
+        generateChampions(selectedGrade);
+    };
 
-    // Function to determine performance level
-    function getPerformanceLevel(score) {
-        if (score >= 0 && score <= 25) return "Level 1 (BE)";
-        if (score >= 26 && score <= 49) return "Level 2 (AE)";
-        if (score >= 50 && score <= 75) return "Level 3 (ME)";
-        if (score >= 76 && score <= 100) return "Level 4 (EE)";
-        return "Invalid Score";
+    document.getElementById("cancelPrompt").onclick = () => {
+        document.body.removeChild(overlay);
+    };
+
+    function alertInline(message) {
+        const alertDiv = document.createElement("div");
+        alertDiv.textContent = message;
+        alertDiv.style.position = "fixed";
+        alertDiv.style.top = "20px";
+        alertDiv.style.left = "50%";
+        alertDiv.style.transform = "translateX(-50%)";
+        alertDiv.style.backgroundColor = "#f44336";
+        alertDiv.style.color = "#fff";
+        alertDiv.style.padding = "10px 20px";
+        alertDiv.style.borderRadius = "5px";
+        alertDiv.style.zIndex = "1001";
+        alertDiv.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000);
     }
 
-    let championsHtml = `<h3 style="color: #4CAF50; text-align: center;">Subject Champions</h3>`;
-    championsHtml += `<table class="learners-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Subject</th>
-                                <th>Champion</th>
-                                <th>Score</th>
-                                <th>Performance Level</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
+    function generateChampions(selectedGrade) {
+        const subjects = [
+            'English', 'Mathematics', 'Kiswahili', 'Science',
+            'Social Studies', 'Agriculture', 'Religious Education', 'Creative Art'
+        ];
 
-    let number = 1;
-    subjects.forEach(subject => {
-        if (champions[subject]) {
-            let champion = champions[subject];
-            let level = getPerformanceLevel(champion.score);
+        const champions = {};
 
-            championsHtml += `<tr>
-                                <td>${number++}</td>
-                                <td>${subject}</td>
-                                <td>${champion.name}</td>
-                                <td>${champion.score}</td>
-                                <td>${level}</td>
-                              </tr>`;
-        } else {
-            championsHtml += `<tr>
-                                <td>${number++}</td>
-                                <td>${subject}</td>
-                                <td colspan="3" style="text-align: center;">No champion found</td>
-                              </tr>`;
+        marks.forEach(mark => {
+            if (mark.grade !== selectedGrade) return;
+
+            mark.scores.forEach((score, index) => {
+                const allSubjects = [
+                    'Gram', 'Comp', 'English', 'Lugha', 'Insha', 'Kiswahili', 'Mathematics',
+                    'Science', 'Social Studies', 'Agriculture', 'Religious Education', 'Creative Art'
+                ];
+
+                const subject = allSubjects[index];
+
+                if (subjects.includes(subject)) {
+                    if (!champions[subject] || score > champions[subject].score) {
+                        champions[subject] = { name: mark.learner, score };
+                    }
+                }
+            });
+        });
+
+        function getPerformanceLevel(score) {
+            if (score >= 0 && score <= 25) return "Level 1 (BE)";
+            if (score >= 26 && score <= 49) return "Level 2 (AE)";
+            if (score >= 50 && score <= 75) return "Level 3 (ME)";
+            if (score >= 76 && score <= 100) return "Level 4 (EE)";
+            return "Invalid Score";
         }
-    });
 
-    championsHtml += `</tbody></table>`;
+        let championsHtml = `<h3 style="color: #4CAF50; text-align: center;">Subject Champions - ${selectedGrade}</h3>`;
+        championsHtml += `<table class="learners-table">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Subject</th>
+                                    <th>Champion</th>
+                                    <th>Score</th>
+                                    <th>Performance Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
 
-    const reportDiv = document.getElementById("report");
-    reportDiv.innerHTML = championsHtml;
+        let number = 1;
+        subjects.forEach(subject => {
+            if (champions[subject]) {
+                let champion = champions[subject];
+                let level = getPerformanceLevel(champion.score);
 
-    // Start fireworks effect for champions
-    startFireworks();
+                championsHtml += `<tr>
+                                    <td>${number++}</td>
+                                    <td>${subject}</td>
+                                    <td>${champion.name}</td>
+                                    <td>${champion.score}</td>
+                                    <td>${level}</td>
+                                  </tr>`;
+            } else {
+                championsHtml += `<tr>
+                                    <td>${number++}</td>
+                                    <td>${subject}</td>
+                                    <td colspan="3" style="text-align: center;">No champion found</td>
+                                  </tr>`;
+            }
+        });
+
+        championsHtml += `</tbody></table>`;
+
+        const reportDiv = document.getElementById("report");
+        reportDiv.innerHTML = championsHtml;
+
+        startFireworks();
+    }
 }
+
 
 
  function printSubjectChampions() {
@@ -6430,6 +6579,14 @@ function saveMarksToStorage() {
     updateStorage(data);
 }
 // Function to update marks table
+function getPerformanceLevel(totalMarks) {
+    if (totalMarks >= 1 && totalMarks <= 200) return "Below expectations";
+    if (totalMarks >= 201 && totalMarks <= 399) return "Approaching expectations";
+    if (totalMarks >= 400 && totalMarks <= 600) return "Meeting expectations";
+    if (totalMarks >= 601 && totalMarks <= 800) return "Exceeding expectations";
+    return "";
+}
+
 function updateMarksTable() {
     // Sort marks by totalMarks in descending order
     marks.sort((a, b) => b.totalMarks - a.totalMarks);
@@ -6437,23 +6594,22 @@ function updateMarksTable() {
     let subjectTotals = Array(12).fill(0); // Ensure correct subject count
     let totalMarksSum = 0; // Accumulate total marks
 
-    let engLangTotal = 0, compTotal = 0, kiswLangTotal = 0, inshaTotal = 0; // Totals for excluded subjects
-    let engLangAvg = 0, compAvg = 0, kiswLangAvg = 0, inshaAvg = 0; // Averages for excluded subjects
+    let engLangTotal = 0, compTotal = 0, kiswLangTotal = 0, inshaTotal = 0;
 
     marksList.innerHTML = marks.map((mark, index) => {
-        // Compute total marks **excluding English Language, Composition, Kiswahili Language, and Insha**
-        mark.totalMarks = mark.scores[2] + mark.scores[5] + mark.scores[6] + mark.scores[7] + 
+        // Compute total marks excluding Eng Lang, Comp, Kisw Lang, Insha
+        mark.totalMarks = mark.scores[2] + mark.scores[5] + mark.scores[6] + mark.scores[7] +
                           mark.scores[8] + mark.scores[9] + mark.scores[10] + mark.scores[11];
 
-        // Update subject totals (including the excluded ones)
+        // Update subject totals (including excluded ones)
         engLangTotal += mark.scores[0];
         compTotal += mark.scores[1];
         kiswLangTotal += mark.scores[3];
         inshaTotal += mark.scores[4];
 
-        // Update totals for included subjects
+        // Update subject totals (excluding the excluded ones)
         mark.scores.forEach((score, idx) => {
-            if (![0, 1, 3, 4].includes(idx)) { // Skip Eng Lang, Composition, Kisw Lang, Insha
+            if (![0, 1, 3, 4].includes(idx)) {
                 subjectTotals[idx] += score;
             }
         });
@@ -6462,50 +6618,30 @@ function updateMarksTable() {
 
         return `
             <tr>
-                <td>${index + 1}</td> <!-- Row Number -->
+                <td>${index + 1}</td>
                 <td>${mark.learner}</td>
                 <td>${mark.grade}</td>
-
-                <!-- English Language & Composition (No Levels) -->
                 <td>${mark.scores[0]}</td>
                 <td>${mark.scores[1]}</td>
-
-                <!-- Eng (With Level) -->
                 <td>${mark.scores[2]}</td><td>${getLevel(mark.scores[2])}</td>
-
-                <!-- Kiswahili Language & Insha (No Levels) -->
                 <td>${mark.scores[3]}</td>
                 <td>${mark.scores[4]}</td>
-
-                <!-- Kiswahili (With Level) -->
                 <td>${mark.scores[5]}</td><td>${getLevel(mark.scores[5])}</td>
-
-                <!-- Mathematics (With Level) -->
                 <td>${mark.scores[6]}</td><td>${getLevel(mark.scores[6])}</td>
-
-                <!-- Science, Social Studies, Agriculture, Religious Ed, Creative Art (With Level) -->
                 <td>${mark.scores[7]}</td><td>${getLevel(mark.scores[7])}</td>
                 <td>${mark.scores[8]}</td><td>${getLevel(mark.scores[8])}</td>
                 <td>${mark.scores[9]}</td><td>${getLevel(mark.scores[9])}</td>
                 <td>${mark.scores[10]}</td><td>${getLevel(mark.scores[10])}</td>
                 <td>${mark.scores[11]}</td><td>${getLevel(mark.scores[11])}</td>
-
                 <td style="font-weight:bold; border: 2px solid black;">${mark.totalMarks}</td>
-                <td>
-                    <button onclick="deleteMarks(${index})">Delete</button>
-                </td>
+                <td>${getPerformanceLevel(mark.totalMarks)}</td>
+                <td><button onclick="deleteMarks(${index})">Delete</button></td>
             </tr>
         `;
     }).join("");
 
-    // Calculate averages
-    let learnerCount = marks.length > 0 ? marks.length : 1; // Prevent division by zero
-    engLangAvg = (engLangTotal / learnerCount).toFixed(2);
-    compAvg = (compTotal / learnerCount).toFixed(2);
-    kiswLangAvg = (kiswLangTotal / learnerCount).toFixed(2);
-    inshaAvg = (inshaTotal / learnerCount).toFixed(2);
-
-    const averages = subjectTotals.map(total => (marks.length > 0 ? (total / marks.length).toFixed(2) : 0));
+    let learnerCount = marks.length || 1;
+    const averages = subjectTotals.map(total => (total / learnerCount).toFixed(2));
 
     const totalRow = `
         <tr>
@@ -6523,16 +6659,17 @@ function updateMarksTable() {
             <td style="font-weight:bold;">${subjectTotals[10]}</td><td></td>
             <td style="font-weight:bold;">${subjectTotals[11]}</td><td></td>
             <td style="font-weight:bold;">${totalMarksSum}</td>
+            <td></td>
         </tr>`;
 
     const averageRow = `
         <tr>
             <td colspan="3" style="font-weight:bold;">Average</td>
-            <td style="font-weight:bold;">${engLangAvg}</td>
-            <td style="font-weight:bold;">${compAvg}</td>
+            <td style="font-weight:bold;">${(engLangTotal / learnerCount).toFixed(2)}</td>
+            <td style="font-weight:bold;">${(compTotal / learnerCount).toFixed(2)}</td>
             <td style="font-weight:bold;">${averages[2]}</td><td></td>
-            <td style="font-weight:bold;">${kiswLangAvg}</td>
-            <td style="font-weight:bold;">${inshaAvg}</td>
+            <td style="font-weight:bold;">${(kiswLangTotal / learnerCount).toFixed(2)}</td>
+            <td style="font-weight:bold;">${(inshaTotal / learnerCount).toFixed(2)}</td>
             <td style="font-weight:bold;">${averages[5]}</td><td></td>
             <td style="font-weight:bold;">${averages[6]}</td><td></td>
             <td style="font-weight:bold;">${averages[7]}</td><td></td>
@@ -6540,11 +6677,17 @@ function updateMarksTable() {
             <td style="font-weight:bold;">${averages[9]}</td><td></td>
             <td style="font-weight:bold;">${averages[10]}</td><td></td>
             <td style="font-weight:bold;">${averages[11]}</td><td></td>
-            <td style="font-weight:bold;">${(marks.length > 0 ? (totalMarksSum / marks.length).toFixed(2) : 0)}</td>
+            <td style="font-weight:bold;">${(totalMarksSum / learnerCount).toFixed(2)}</td>
+            <td></td>
         </tr>`;
 
     marksList.innerHTML += totalRow + averageRow;
+
+    // Refresh grade dropdown after table is built
+    populateGradesDropdown();
 }
+
+
 
 // Function to determine performance level
 function getLevel(score) {
@@ -6562,248 +6705,314 @@ function deleteMarks(index) {
     updateMarksTable(); // Update the table to reflect changes
 }
 
-// Delete a mark entry
-function deleteMarks(index) {
-    marks.splice(index, 1); // Remove the mark entry at the specified index
-    saveMarksToStorage(); // Save updated marks to storage
-    updateMarksTable(); // Update the table to reflect changes
-}
-
-// Function to determine performance level
-function getLevel(score) {
-    if (score >= 75) return 4;
-    if (score >= 50) return 3;
-    if (score >= 25) return 2;
-    if (score < 25) return 1;
-    return 0; // Default level if score is invalid
-}
-
 // Event to initialize on DOM load
 document.addEventListener("DOMContentLoaded", function () {
     initializeStorage(); // Ensure storage is initialized
     loadMarks(); // Load marks from storage
 });
 
+
 function generateGenderPerformance() {
-    const marksTableBody = document.getElementById("marksList");
-    const learnersTableBody = document.getElementById("learnersList");
+    // Overlay prompt for grade input
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "1000";
 
-    if (!marksTableBody || !learnersTableBody) {
-        alert("Marks table or learners table not found.");
-        return;
+    const promptBox = document.createElement("div");
+    promptBox.style.background = "#fff";
+    promptBox.style.padding = "20px";
+    promptBox.style.borderRadius = "8px";
+    promptBox.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+    promptBox.style.textAlign = "center";
+    promptBox.innerHTML = `
+        <h3 style="margin-top: 0; color: #333;">Enter Grade</h3>
+        <input type="text" id="gradeInput" placeholder="e.g., 9A" style="padding: 8px; width: 80%; border: 1px solid #ccc; border-radius: 4px;"><br><br>
+        <button id="submitGrade" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Submit</button>
+        <button id="cancelPrompt" style="padding: 8px 16px; margin-left: 10px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+    `;
+    overlay.appendChild(promptBox);
+    document.body.appendChild(overlay);
+
+    function alertInline(message) {
+        const alertDiv = document.createElement("div");
+        alertDiv.textContent = message;
+        alertDiv.style.position = "fixed";
+        alertDiv.style.top = "20px";
+        alertDiv.style.left = "50%";
+        alertDiv.style.transform = "translateX(-50%)";
+        alertDiv.style.backgroundColor = "#f44336";
+        alertDiv.style.color = "#fff";
+        alertDiv.style.padding = "10px 20px";
+        alertDiv.style.borderRadius = "5px";
+        alertDiv.style.zIndex = "1001";
+        alertDiv.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000);
     }
 
-    // Extract learners' details (Name, Gender)
-    const learners = Array.from(learnersTableBody.querySelectorAll("tr")).map(row => {
-        const cells = row.querySelectorAll("td");
-        return {
-            name: cells[2]?.textContent.trim(),
-            gender: cells[3]?.textContent.trim().toLowerCase(),
-        };
-    });
-
-  // Extract marks data exactly as recorded
-const marks = Array.from(marksTableBody.querySelectorAll("tr")).map((row, index) => {
-    const cells = row.querySelectorAll("td");
-    return {
-        number: index + 1, // Add numbering
-        learner: cells[1]?.textContent.trim(),
-        grade: cells[2]?.textContent.trim(),
-        gram: parseInt(cells[3]?.textContent.trim()) || 0,
-        comp: parseInt(cells[4]?.textContent.trim()) || 0,
-        eng: parseInt(cells[5]?.textContent.trim()) || 0,
-        engLevel: cells[6]?.textContent.trim() || "-",
-        lugha: parseInt(cells[7]?.textContent.trim()) || 0,
-        insha: parseInt(cells[8]?.textContent.trim()) || 0,
-        kiswa: parseInt(cells[9]?.textContent.trim()) || 0,
-        kiswaLevel: cells[10]?.textContent.trim() || "-",
-        math: parseInt(cells[11]?.textContent.trim()) || 0,
-        mathLevel: cells[12]?.textContent.trim() || "-",
-        scie: parseInt(cells[13]?.textContent.trim()) || 0,
-        scieLevel: cells[14]?.textContent.trim() || "-",
-        sst: parseInt(cells[15]?.textContent.trim()) || 0,
-        sstLevel: cells[16]?.textContent.trim() || "-",
-        agric: parseInt(cells[17]?.textContent.trim()) || 0,
-        agricLevel: cells[18]?.textContent.trim() || "-",
-        cre: parseInt(cells[19]?.textContent.trim()) || 0,
-        creLevel: cells[20]?.textContent.trim() || "-",
-        c_a: parseInt(cells[21]?.textContent.trim()) || 0,
-        c_aLevel: cells[22]?.textContent.trim() || "-",
-        totalMarks: parseInt(cells[23]?.textContent.trim()) || 0
+    document.getElementById("cancelPrompt").onclick = () => {
+        document.body.removeChild(overlay);
     };
-});
 
-
-    // Group marks by gender
-    const genderPerformance = { Male: [], Female: [] };
-
-    marks.forEach(markEntry => {
-        const learner = learners.find(l => l.name === markEntry.learner);
-        if (learner) {
-            markEntry.gender = learner.gender;
-            if (learner.gender === "male") {
-                genderPerformance.Male.push(markEntry);
-            } else if (learner.gender === "female") {
-                genderPerformance.Female.push(markEntry);
-            }
+    document.getElementById("submitGrade").onclick = () => {
+        const gradeInput = document.getElementById("gradeInput").value.trim().toLowerCase();
+        if (!gradeInput) {
+            alertInline("Grade input is required.");
+            return;
         }
-    });
 
-    // Sort learners within each gender by total marks (Descending order)
-    genderPerformance.Male.sort((a, b) => b.totalMarks - a.totalMarks);
-    genderPerformance.Female.sort((a, b) => b.totalMarks - a.totalMarks);
+        document.body.removeChild(overlay);
+        const marksTableBody = document.getElementById("marksList");
+        const learnersTableBody = document.getElementById("learnersList");
 
-    // Function to calculate totals and averages (excluding levels)
-    function calculateSubjectStats(data) {
-        let subjects = ["gram", "comp", "eng", "lugha", "insha", "kiswa", "math", "scie", "sst", "agric", "cre", "c_a", "totalMarks"];
-        let totals = {};
-        let averages = {};
+        if (!marksTableBody || !learnersTableBody) {
+            alertInline("Marks table or learners table not found.");
+            return;
+        }
 
-        subjects.forEach(subject => totals[subject] = 0);
-
-        data.forEach(entry => {
-            subjects.forEach(subject => totals[subject] += entry[subject]);
+        const learners = Array.from(learnersTableBody.querySelectorAll("tr")).map(row => {
+            const cells = row.querySelectorAll("td");
+            return {
+                name: cells[2]?.textContent.trim(),
+                gender: cells[3]?.textContent.trim().toLowerCase(),
+            };
         });
 
-        let count = data.length;
-        subjects.forEach(subject => {
-            averages[subject] = count > 0 ? (totals[subject] / count).toFixed(1) : 0;
+        const marks = Array.from(marksTableBody.querySelectorAll("tr")).map((row, index) => {
+            const cells = row.querySelectorAll("td");
+            return {
+                number: index + 1,
+                learner: cells[1]?.textContent.trim(),
+                grade: cells[2]?.textContent.trim().toLowerCase(),
+                gram: parseInt(cells[3]?.textContent.trim()) || 0,
+                comp: parseInt(cells[4]?.textContent.trim()) || 0,
+                eng: parseInt(cells[5]?.textContent.trim()) || 0,
+                engLevel: cells[6]?.textContent.trim() || "-",
+                lugha: parseInt(cells[7]?.textContent.trim()) || 0,
+                insha: parseInt(cells[8]?.textContent.trim()) || 0,
+                kiswa: parseInt(cells[9]?.textContent.trim()) || 0,
+                kiswaLevel: cells[10]?.textContent.trim() || "-",
+                math: parseInt(cells[11]?.textContent.trim()) || 0,
+                mathLevel: cells[12]?.textContent.trim() || "-",
+                scie: parseInt(cells[13]?.textContent.trim()) || 0,
+                scieLevel: cells[14]?.textContent.trim() || "-",
+                sst: parseInt(cells[15]?.textContent.trim()) || 0,
+                sstLevel: cells[16]?.textContent.trim() || "-",
+                agric: parseInt(cells[17]?.textContent.trim()) || 0,
+                agricLevel: cells[18]?.textContent.trim() || "-",
+                cre: parseInt(cells[19]?.textContent.trim()) || 0,
+                creLevel: cells[20]?.textContent.trim() || "-",
+                c_a: parseInt(cells[21]?.textContent.trim()) || 0,
+                c_aLevel: cells[22]?.textContent.trim() || "-",
+                totalMarks: parseInt(cells[23]?.textContent.trim()) || 0
+            };
         });
 
-        return { totals, averages };
-    }
-// Function to generate performance tables
-function createPerformanceTable(data, gender) {
-    if (data.length === 0) return `<h3>No ${gender} learners with recorded marks.</h3>`;
+        const filteredMarks = marks.filter(entry => entry.grade === gradeInput);
+        const genderPerformance = { Male: [], Female: [] };
 
-    let { totals, averages } = calculateSubjectStats(data);
-    let tableId = `genderPerformanceTable_${gender}`;
+        filteredMarks.forEach(markEntry => {
+            const learner = learners.find(l => l.name === markEntry.learner);
+            if (learner) {
+                markEntry.gender = learner.gender;
+                if (learner.gender === "male") {
+                    genderPerformance.Male.push(markEntry);
+                } else if (learner.gender === "female") {
+                    genderPerformance.Female.push(markEntry);
+                }
+            }
+        });
 
-    let tableHtml = `
-        <h2 style="color: ${gender === "Male" ? "blue" : "purple"}; text-align: center;">
-            ${gender} Performance Report
-        </h2>
-        <div id="${tableId}">
-            <table border="1" style="width:100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: #4CAF50; color: white;">
-                        <th>No.</th><th>Name</th><th>Grade</th><th>Gram</th><th>Comp</th>
-                        <th>Eng</th><th>Lev</th><th>Lugha</th><th>Insha</th><th>Kiswa</th><th>Lev</th>
-                        <th>Math</th><th>Lev</th><th>Scie</th><th>Lev</th><th>Sst</th><th>Lev</th>
-                        <th>Agric</th><th>Lev</th><th>Cre</th><th>Lev</th><th>C/A</th><th>Lev</th>
-                        <th>Total Marks</th>
+        genderPerformance.Male.sort((a, b) => b.totalMarks - a.totalMarks);
+        genderPerformance.Female.sort((a, b) => b.totalMarks - a.totalMarks);
+
+        const subjects = ["gram", "comp", "eng", "lugha", "insha", "kiswa", "math", "scie", "sst", "agric", "cre", "c_a", "totalMarks"];
+
+        function calculateStats(data) {
+            let totals = {}, averages = {};
+            subjects.forEach(sub => totals[sub] = 0);
+            data.forEach(entry => subjects.forEach(sub => totals[sub] += entry[sub]));
+            subjects.forEach(sub => averages[sub] = data.length ? (totals[sub] / data.length).toFixed(1) : 0);
+            return { totals, averages };
+        }
+
+        function createTable(data, gender) {
+            if (data.length === 0) return `<h3 style="text-align: center;">No ${gender} learners in ${gradeInput.toUpperCase()} with recorded marks.</h3>`;
+            const { totals, averages } = calculateStats(data);
+            let html = `
+                <h2 style="color: ${gender === "Male" ? "blue" : "purple"}; text-align: center;">
+                    ${gender} Performance Report - Grade ${gradeInput.toUpperCase()}
+                </h2>
+                <table border="1" style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #4CAF50; color: white;">
+                            <th>No.</th><th>Name</th><th>Grade</th><th>Gram</th><th>Comp</th>
+                            <th>Eng</th><th>Lev</th><th>Lugha</th><th>Insha</th><th>Kiswa</th><th>Lev</th>
+                            <th>Math</th><th>Lev</th><th>Scie</th><th>Lev</th><th>Sst</th><th>Lev</th>
+                            <th>Agric</th><th>Lev</th><th>Cre</th><th>Lev</th><th>C/A</th><th>Lev</th>
+                            <th>Total Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            data.forEach((entry, i) => {
+                html += `
+                    <tr>
+                        <td>${i + 1}</td><td>${entry.learner}</td><td>${entry.grade.toUpperCase()}</td>
+                        <td>${entry.gram}</td><td>${entry.comp}</td><td>${entry.eng}</td><td>${entry.engLevel}</td>
+                        <td>${entry.lugha}</td><td>${entry.insha}</td><td>${entry.kiswa}</td><td>${entry.kiswaLevel}</td>
+                        <td>${entry.math}</td><td>${entry.mathLevel}</td><td>${entry.scie}</td><td>${entry.scieLevel}</td>
+                        <td>${entry.sst}</td><td>${entry.sstLevel}</td><td>${entry.agric}</td><td>${entry.agricLevel}</td>
+                        <td>${entry.cre}</td><td>${entry.creLevel}</td><td>${entry.c_a}</td><td>${entry.c_aLevel}</td>
+                        <td><strong>${entry.totalMarks}</strong></td>
                     </tr>
-                </thead>
-                <tbody>
-    `;
+                `;
+            });
 
-    data.forEach((entry, index) => {
-        tableHtml += `
-            <tr>
-                <td>${index + 1}</td><td>${entry.learner}</td><td>${entry.grade}</td><td>${entry.gram}</td><td>${entry.comp}</td>
-                <td>${entry.eng}</td><td>${entry.engLevel}</td><td>${entry.lugha}</td><td>${entry.insha}</td>
-                <td>${entry.kiswa}</td><td>${entry.kiswaLevel}</td><td>${entry.math}</td><td>${entry.mathLevel}</td>
-                <td>${entry.scie}</td><td>${entry.scieLevel}</td><td>${entry.sst}</td><td>${entry.sstLevel}</td>
-                <td>${entry.agric}</td><td>${entry.agricLevel}</td><td>${entry.cre}</td><td>${entry.creLevel}</td>
-                <td>${entry.c_a}</td><td>${entry.c_aLevel}</td><td><strong>${entry.totalMarks}</strong></td>
-            </tr>
+            html += `
+                <tr style="background: yellow; font-weight: bold;">
+                    <td colspan="3">Totals</td>
+                    <td>${totals.gram}</td><td>${totals.comp}</td><td>${totals.eng}</td><td>-</td>
+                    <td>${totals.lugha}</td><td>${totals.insha}</td><td>${totals.kiswa}</td><td>-</td>
+                    <td>${totals.math}</td><td>-</td><td>${totals.scie}</td><td>-</td>
+                    <td>${totals.sst}</td><td>-</td><td>${totals.agric}</td><td>-</td>
+                    <td>${totals.cre}</td><td>-</td><td>${totals.c_a}</td><td>-</td>
+                    <td><strong>${totals.totalMarks}</strong></td>
+                </tr>
+                <tr style="background: lightblue; font-weight: bold;">
+                    <td colspan="3">Averages</td>
+                    <td>${averages.gram}</td><td>${averages.comp}</td><td>${averages.eng}</td><td>-</td>
+                    <td>${averages.lugha}</td><td>${averages.insha}</td><td>${averages.kiswa}</td><td>-</td>
+                    <td>${averages.math}</td><td>-</td><td>${averages.scie}</td><td>-</td>
+                    <td>${averages.sst}</td><td>-</td><td>${averages.agric}</td><td>-</td>
+                    <td>${averages.cre}</td><td>-</td><td>${averages.c_a}</td><td>-</td>
+                    <td><strong>${averages.totalMarks}</strong></td>
+                </tr>
+            </tbody></table><br>`;
+            return html;
+        }
+
+        const container = document.createElement("div");
+        container.className = "gender-performance-container";
+        container.innerHTML = createTable(genderPerformance.Male, "Male") + createTable(genderPerformance.Female, "Female");
+        document.body.appendChild(container);
+
+        const printBtn = document.createElement("button");
+        printBtn.textContent = "Print Report";
+        printBtn.style.cssText = `
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         `;
-    });
-
-    // Totals and Averages Rows (Levels removed)
-    tableHtml += `
-        <tr style="background: yellow; font-weight: bold;">
-            <td colspan="3">Totals</td>
-            <td>${totals.gram}</td><td>${totals.comp}</td><td>${totals.eng}</td><td>-</td>
-            <td>${totals.lugha}</td><td>${totals.insha}</td><td>${totals.kiswa}</td><td>-</td>
-            <td>${totals.math}</td><td>-</td><td>${totals.scie}</td><td>-</td>
-            <td>${totals.sst}</td><td>-</td><td>${totals.agric}</td><td>-</td>
-            <td>${totals.cre}</td><td>-</td><td>${totals.c_a}</td><td>-</td>
-            <td><strong>${totals.totalMarks}</strong></td>
-        </tr>
-        <tr style="background: lightblue; font-weight: bold;">
-            <td colspan="3">Averages</td>
-            <td>${averages.gram}</td><td>${averages.comp}</td><td>${averages.eng}</td><td>-</td>
-            <td>${averages.lugha}</td><td>${averages.insha}</td><td>${averages.kiswa}</td><td>-</td>
-            <td>${averages.math}</td><td>-</td><td>${averages.scie}</td><td>-</td>
-            <td>${averages.sst}</td><td>-</td><td>${averages.agric}</td><td>-</td>
-            <td>${averages.cre}</td><td>-</td><td>${averages.c_a}</td><td>-</td>
-            <td><strong>${averages.totalMarks}</strong></td>
-        </tr>
-    `;
-
-    // Add separate print buttons for each gender
-    tableHtml += `</tbody></table><br>
-        <button onclick="printGenderPerformance('${tableId}', '${gender}')" style="padding: 10px; background: green; color: white; border: none; cursor: pointer; border-radius: 5px;">
-            Print ${gender} Performance
-        </button><br><br>
-    `;
-
-    return tableHtml;
+        printBtn.onclick = printGenderPerformanceTable;
+        document.body.appendChild(printBtn);
+    };
 }
 
-// Generate performance reports for each gender separately
-document.getElementById("report").innerHTML = 
-    createPerformanceTable(genderPerformance.Male, "Male") + 
-    createPerformanceTable(genderPerformance.Female, "Female");
-}
-function printGenderPerformance(tableId, gender) {
-    let tableElement = document.getElementById(tableId);
-
-    if (!tableElement) {
-        alert("Table not found!");
+function printGenderPerformanceTable() {
+    const container = document.querySelector("div.gender-performance-container");
+    if (!container) {
+        alert("No gender performance report found to print.");
         return;
     }
 
-    let tableContent = tableElement.outerHTML;
-    let printWindow = window.open('', '', 'width=900,height=600');
+    const currentYear = new Date().getFullYear();
+    const currentDate = new Date().toLocaleDateString();
 
-    // Get current year dynamically
-    let currentYear = new Date().getFullYear();
+    // Clone the container to avoid altering the original page content
+    const clonedContainer = container.cloneNode(true);
 
-    // Extract the grade dynamically from the first learner row
-    let grade = tableElement.querySelector("tbody tr td:nth-child(3)")?.textContent || "Unknown";
+    // Add "Performance Level" column
+    const tables = clonedContainer.querySelectorAll("table");
+
+    tables.forEach(table => {
+        const headerRow = table.querySelector("thead tr");
+        const bodyRows = table.querySelectorAll("tbody tr");
+
+        // Add header column
+        const performanceHeader = document.createElement("th");
+        performanceHeader.textContent = "Performance Level";
+        headerRow.appendChild(performanceHeader);
+
+        // Add performance level for each learner
+        bodyRows.forEach(row => {
+            const totalMarksCell = row.cells[row.cells.length - 1]; // Assuming total marks is last
+            const totalMarks = parseInt(totalMarksCell.textContent.trim()) || 0;
+            const performanceLevel = getPerformanceLevel(totalMarks);
+
+            const perfCell = document.createElement("td");
+            perfCell.textContent = performanceLevel;
+            row.appendChild(perfCell);
+        });
+    });
+
+    const printWindow = window.open("", "", "width=900,height=700");
 
     printWindow.document.write(`
         <html>
-        <head>
-            <title>Print ${gender} Performance Report</title>
-            <style>
-                body { font-family: Arial, sans-serif; text-align: center; color: black; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; color: black; }
-                th, td { border: 1px solid black; padding: 8px; text-align: center; color: black; }
-                th { background: #D3D3D3; color: black; }
-                h1, h2, h3 { font-size: 18px; font-weight: bold; margin: 5px; color: black; }
-                .header-section { text-align: center; margin-bottom: 20px; }
-                .school-logo { width: 100px; height: 100px; margin-bottom: 10px; }
-                @media print {
-                    body * { visibility: hidden; }
-                    .print-container, .print-container * { visibility: visible; }
-                    .print-container { position: absolute; left: 0; top: 0; width: 100%; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="print-container">
+            <head>
+                <title>NACHU COMPREHENSIVE SCHOOL GENDER PERFORMANCE REPORT</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; color: black; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid black; padding: 8px; text-align: center; color: black; }
+                    thead { background-color: #4CAF50; color: white; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    h1, h2, h3 { text-align: center; margin: 5px 0; font-weight: bold; color: black; }
+                    .school-logo { width: 100px; height: 100px; display: block; margin: 0 auto 10px; }
+                    .footer { text-align: center; margin-top: 20px; font-size: 14px; color: black; }
+                </style>
+            </head>
+            <body>
                 <div class="header-section">
-                    <img src="school-logo.png" alt="School Logo" class="school-logo"><br>
-                    <h1>NACHU PRIMARY SCHOOL GENDER PERFORMANCE REPORT</h1>
-                    <h2>ADDRESS: P.O BOX 561-00902 KIKUYU, KENYA</h2>
+                    <img src="https://i.imgur.com/uWrz8rt.png" alt="School Logo" class="school-logo">
+                    <h1>NACHU COMPREHENSIVE SCHOOL GENDER PERFORMANCE REPORT</h1>
+                    <h2>PO BOX 561-00902 KIKUYU, KENYA</h2>
                     <h3>Phone: +254-700-123456</h3>
                     <h3>School Motto: "HARD WORK PAYS"</h3>
                     <h3>Year: ${currentYear}</h3>
-                    <h3>Grade: ${grade}</h3>
-                    <h3>${gender} Performance Report</h3>
+                    <h3>Grade: ${
+                        clonedContainer.querySelector("table tbody tr td:nth-child(3)")?.textContent || "Unknown"
+                    }</h3>
                 </div>
-                ${tableContent}
-            </div>
-        </body>
+                ${clonedContainer.innerHTML}
+                <div class="footer">
+                    <p>Printed on: ${currentDate}</p>
+                </div>
+            </body>
         </html>
     `);
 
     printWindow.document.close();
+    printWindow.focus();
     printWindow.print();
+    printWindow.close();
+
+    // Helper function to determine performance level
+    function getPerformanceLevel(totalMarks) {
+        if (totalMarks >= 1 && totalMarks <= 200) return "Below expectations";
+        if (totalMarks >= 201 && totalMarks <= 399) return "Approaching expectations";
+        if (totalMarks >= 400 && totalMarks <= 600) return "Meeting expectations";
+        if (totalMarks >= 601 && totalMarks <= 800) return "Exceeding expectations";
+        return "";
+    }
 }
+
+
+
 
 document.getElementById('photoInput').addEventListener('change', function (event) {
     const files = event.target.files;
@@ -7696,8 +7905,8 @@ function updateLearnersTable() {
         </tr>
     `).join("");
 
-
-    updateLearnerSelect(); // Update dropdown or related components
+    updateLearnerSelect();       // (Your existing helper)
+    populateGradeDropdown();     // ?? Add this line to dynamically update grade list
 }
 // Function to show learner details in a modal
 function viewLearnerDetails(index) {
@@ -9623,7 +9832,7 @@ function countLearnersByGrade() {
     let output = `
         <div style="text-align:center;">
             <img src="https://i.imgur.com/uWrz8rt.png" alt="School Logo" style="max-width: 80px;">
-            <h2 style="margin: 5px 0; color: black;">Nachu Junior School</h2>
+            <h2 style="margin: 5px 0; color: black;">Nachu Primary  School</h2>
             <p><strong>P.O BOX 561-00902, KIKUYU, KENYA</strong></p>
             <p><strong>Phone: +254-700-123456</strong></p>
             <p><strong>School Motto:</strong> "Excellence Through Knowledge"</p>
@@ -10681,7 +10890,800 @@ function toggleCheckboxes(groupName, masterCheckbox) {
     // Set each checkbox's checked property to match the master checkbox's state
     checkboxes.forEach(checkbox => checkbox.checked = masterCheckbox.checked);
 }
+function showMarksStatus() {
+  const container = document.getElementById("marksStatusWrapper");
+  container.innerHTML = "";
 
+  const wrapper = document.createElement("div");
+
+  // === School Header Section (Print only) ===
+  const headerDiv = document.createElement("div");
+  headerDiv.id = "printHeader";
+  headerDiv.style.textAlign = "center";
+  headerDiv.style.marginBottom = "20px";
+  headerDiv.style.display = "none"; // Hidden by default, shown in print
+
+  const logoImg = document.createElement("img");
+  logoImg.src = "https://i.imgur.com/uWrz8rt.png"; // Replace with your logo path
+  logoImg.alt = "School Logo";
+  logoImg.style.width = "100px";
+  logoImg.style.marginBottom = "10px";
+
+  const schoolName = document.createElement("h2");
+  schoolName.textContent = "Nachu Primary  School"; // Replace with your school name
+  schoolName.style.margin = "0";
+
+  const title = document.createElement("h3");
+  title.textContent = "Marks Submission Status Per Grade";
+  title.style.margin = "5px 0 15px 0";
+  title.style.fontWeight = "normal";
+
+  headerDiv.appendChild(logoImg);
+  headerDiv.appendChild(schoolName);
+  headerDiv.appendChild(title);
+  wrapper.appendChild(headerDiv);
+
+  // === Print Button ===
+  const tableHeaderBar = document.createElement("div");
+  tableHeaderBar.style.display = "flex";
+  tableHeaderBar.style.justifyContent = "flex-end";
+  tableHeaderBar.style.marginBottom = "8px";
+
+  const printBtn = document.createElement("button");
+  printBtn.innerHTML = `<i class="fa fa-print"></i> Print This Table`; // FontAwesome print icon
+  printBtn.style.backgroundColor = "#4CAF50";
+  printBtn.style.color = "white";
+  printBtn.style.padding = "8px 12px";
+  printBtn.style.border = "none";
+  printBtn.style.borderRadius = "5px";
+  printBtn.style.cursor = "pointer";
+  printBtn.onclick = () => window.print();
+
+  tableHeaderBar.appendChild(printBtn);
+  wrapper.appendChild(tableHeaderBar);
+
+  // === Table Creation ===
+  const table = document.createElement("table");
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+  table.style.marginTop = "0px";
+  table.innerHTML = `
+    <thead>
+      <tr style="background-color: #4CAF50; color: white;">
+        <th style="border: 1px solid black; padding: 8px;">Grade</th>
+        <th style="border: 1px solid black; padding: 8px;">Registered Learners</th>
+        <th style="border: 1px solid black; padding: 8px;">Recorded Learners</th>
+        <th style="border: 1px solid black; padding: 8px;">Learners Without Marks</th>
+        <th style="border: 1px solid black; padding: 8px;">Missing Names</th>
+        <th style="border: 1px solid black; padding: 8px;">Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+
+  const tbody = table.querySelector("tbody");
+
+  const learnersByGrade = learners.reduce((acc, learner) => {
+    const grade = learner.grade;
+    if (!acc[grade]) acc[grade] = [];
+    acc[grade].push(learner.name);
+    return acc;
+  }, {});
+
+  const marksByGrade = marks.reduce((acc, entry) => {
+    const grade = entry.grade;
+    if (!acc[grade]) acc[grade] = [];
+    acc[grade].push(entry.learner);
+    return acc;
+  }, {});
+
+  for (const grade in learnersByGrade) {
+    const registered = learnersByGrade[grade];
+    const recorded = marksByGrade[grade] || [];
+    const missing = registered.filter(name => !recorded.includes(name));
+
+    const row = document.createElement("tr");
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.innerHTML = `<i class="fa fa-trash"></i> Delete`; // FontAwesome trash icon
+    deleteBtn.style.backgroundColor = "#f44336";
+    deleteBtn.style.color = "white";
+    deleteBtn.style.padding = "5px 10px";
+    deleteBtn.style.border = "none";
+    deleteBtn.style.borderRadius = "4px";
+    deleteBtn.style.cursor = "pointer";
+    deleteBtn.onclick = () => deleteGradeMarks(grade);
+
+    row.innerHTML = `
+      <td style="border: 1px solid black; padding: 8px;">${grade}</td>
+      <td style="border: 1px solid black; padding: 8px;">${registered.length}</td>
+      <td style="border: 1px solid black; padding: 8px;">${recorded.length}</td>
+      <td style="border: 1px solid black; padding: 8px;">${missing.length}</td>
+      <td style="border: 1px solid black; padding: 8px; color: red;">${missing.join(', ') || 'All recorded'}</td>
+    `;
+
+    const actionCell = document.createElement("td");
+    actionCell.style.border = "1px solid black";
+    actionCell.style.padding = "8px";
+    actionCell.appendChild(deleteBtn);
+
+    row.appendChild(actionCell);
+    tbody.appendChild(row);
+  }
+
+  wrapper.appendChild(table);
+  container.appendChild(wrapper);
+}
+
+
+let isMarksStatusVisible = false;
+
+function toggleMarksStatus() {
+  const wrapper = document.getElementById("marksStatusWrapper");
+  const button = document.getElementById("toggleMarksStatusBtn");
+
+  if (!isMarksStatusVisible) {
+    showMarksStatus(); // Render table
+    wrapper.style.display = "block";
+    button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Marks Recording Summary';
+    isMarksStatusVisible = true;
+  } else {
+    wrapper.style.display = "none";
+    button.innerHTML = '<i class="fas fa-chart-bar"></i> Show Marks Recording Summary';
+    isMarksStatusVisible = false;
+  }
+}
+
+function deleteGradeMarks(grade) {
+  // Display the custom confirmation modal
+  const modal = document.getElementById("customConfirmModal");
+  const gradeText = document.getElementById("gradeText");
+  gradeText.textContent = grade;
+  
+  modal.style.display = "flex"; // Show the modal
+
+  // Return a promise to handle the user's response asynchronously
+  return new Promise((resolve) => {
+    // Handle Yes button click
+    document.getElementById("confirmYes").onclick = function() {
+      // Remove marks for this grade only
+      marks = marks.filter(entry => entry.grade !== grade);
+      saveMarksToStorage();
+      showMarksStatus();
+      
+      // Show success alert with inline CSS styling
+      showCustomAlert(`
+        <div style="color: white; background-color: #ff4d4d; padding: 10px; border-radius: 5px; font-weight: bold;">
+          All marks for Grade ${grade} have been deleted.
+        </div>`, 
+        "error"
+      );
+      
+      modal.style.display = "none"; // Hide the modal
+      resolve(true); // Resolve with true (confirmed)
+    };
+
+    // Handle No button click
+    document.getElementById("confirmNo").onclick = function() {
+      modal.style.display = "none"; // Hide the modal
+      resolve(false); // Resolve with false (cancelled)
+    };
+  });
+}
+
+// HTML for custom confirmation modal
+document.body.insertAdjacentHTML('beforeend', `
+  <div id="customConfirmModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background-color: white; padding: 20px; border-radius: 10px; text-align: center; width: 300px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+      <p style="color: #333; font-size: 16px;">Delete all marks recorded for Grade <span id="gradeText"></span>? This cannot be undone.</p>
+      <button id="confirmYes" style="background-color: red; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">Yes</button>
+      <button id="confirmNo" style="background-color: green; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">No</button>
+    </div>
+  </div>
+`);
+function populateGradeDropdown() {
+  const dropdown = document.getElementById("gradeDropdown");
+  dropdown.innerHTML = '<option value="">-- Select Grade --</option>';
+
+  const grades = [...new Set(learners.map(l => l.grade))].sort();
+  grades.forEach(grade => {
+    const option = document.createElement("option");
+    option.value = grade;
+    option.textContent = grade;
+    dropdown.appendChild(option);
+  });
+}
+
+function showLearnerNamesOnly() {
+  const selectedGrade = document.getElementById("gradeDropdown").value;
+  const tableBody = document.getElementById("learnerNamesList");
+  const gradeHeader = document.getElementById("selectedGradeHeader");
+
+  tableBody.innerHTML = "";
+  gradeHeader.textContent = selectedGrade || "All";
+
+  const filtered = learners.filter(l => l.grade === selectedGrade);
+
+  const boys = filtered.filter(l => l.gender?.toLowerCase() === "male");
+  const girls = filtered.filter(l => l.gender?.toLowerCase() === "female");
+
+  if (boys.length) {
+    const boysHeader = document.createElement("tr");
+    const boysCell = document.createElement("td");
+    boysCell.colSpan = 2;
+    boysCell.textContent = "--- BOYS ---";
+    boysCell.style.textAlign = "center";
+    boysCell.style.fontWeight = "bold";
+    boysCell.style.color = "black";
+    boysHeader.appendChild(boysCell);
+    tableBody.appendChild(boysHeader);
+
+    boys.forEach((l, index) => {
+      const row = document.createElement("tr");
+
+      const noCell = document.createElement("td");
+      noCell.textContent = index + 1;
+      noCell.style.border = "1px solid black";
+      noCell.style.padding = "8px";
+      noCell.style.color = "black";
+
+      const nameCell = document.createElement("td");
+      nameCell.textContent = l.name;
+      nameCell.style.border = "1px solid black";
+      nameCell.style.padding = "8px";
+      nameCell.style.color = "black";
+
+      row.appendChild(noCell);
+      row.appendChild(nameCell);
+      tableBody.appendChild(row);
+    });
+  }
+
+  if (girls.length) {
+    const girlsHeader = document.createElement("tr");
+    const girlsCell = document.createElement("td");
+    girlsCell.colSpan = 2;
+    girlsCell.textContent = "--- GIRLS ---";
+    girlsCell.style.textAlign = "center";
+    girlsCell.style.fontWeight = "bold";
+    girlsCell.style.color = "black";
+    girlsHeader.appendChild(girlsCell);
+    tableBody.appendChild(girlsHeader);
+
+    girls.forEach((l, index) => {
+      const row = document.createElement("tr");
+
+      const noCell = document.createElement("td");
+      noCell.textContent = index + 1;
+      noCell.style.border = "1px solid black";
+      noCell.style.padding = "8px";
+      noCell.style.color = "black";
+
+      const nameCell = document.createElement("td");
+      nameCell.textContent = l.name;
+      nameCell.style.border = "1px solid black";
+      nameCell.style.padding = "8px";
+      nameCell.style.color = "black";
+
+      row.appendChild(noCell);
+      row.appendChild(nameCell);
+      tableBody.appendChild(row);
+    });
+  }
+}
+
+function printLearnersTable() {
+  const printable = document.getElementById("printableLearnersTable").innerHTML;
+  const win = window.open('', '', 'height=600,width=800');
+  win.document.write('<html><head><title>Print Learners</title>');
+  win.document.write('<style>body { color: black; font-family: Arial; } table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid black; padding: 8px; color: black; } h2, h3 { color: black; }</style>');
+  win.document.write('</head><body>');
+  win.document.write(printable);
+  win.document.write('</body></html>');
+  win.document.close();
+  win.focus();
+  win.print();
+  win.close();
+}
+
+function populateMarksGradesDropdown() {
+  const gradeSet = new Set();
+  const rows = document.querySelectorAll('#marksList tr');
+
+  rows.forEach((row, index) => {
+    // Skip header row or short rows
+    if (index === 0 || row.cells.length < 3) return;
+
+    let gradeText = row.cells[2].textContent.trim().toUpperCase();
+
+    // Normalize "Grade 6" ? "6"
+    gradeText = gradeText.replace(/^(GRADE|FORM)\s*/i, '');
+
+    // Accept: 1-12, 6A, 7B, etc.
+    if (/^([1-9]|1[0-2])[A-Z]?$/.test(gradeText)) {
+      gradeSet.add(gradeText);
+    }
+  });
+
+  const gradeSelect = document.getElementById('gradeSelect');
+  const currentValue = gradeSelect.value;
+  gradeSelect.innerHTML = '<option value="">All Grades</option>';
+
+  Array.from(gradeSet).sort().forEach(grade => {
+    const option = document.createElement('option');
+    option.value = grade;
+    option.textContent = grade;
+    gradeSelect.appendChild(option);
+  });
+
+  // Restore previously selected value if still present
+  if (gradeSet.has(currentValue)) {
+    gradeSelect.value = currentValue;
+  }
+}
+
+// Run on page load
+window.onload = function () {
+  populateMarksGradesDropdown();
+
+  // Observe changes in the marks list table
+  const marksList = document.getElementById('marksList');
+  if (marksList) {
+    const observer = new MutationObserver(() => {
+      populateMarksGradesDropdown();
+    });
+
+    observer.observe(marksList, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+};
+function filterMarksByGrade() {
+    const selectedGrade = document.getElementById("gradeSelect").value;
+    const rows = Array.from(document.querySelectorAll("#marksList tr"));
+    
+    let subjectTotals = Array(10).fill(0);
+    let visibleRowCount = 0;
+    let totalMarksSum = 0;
+
+    // Remove existing totals/averages if present
+    document.querySelectorAll("#marksList .summary-row").forEach(row => row.remove());
+
+    rows.forEach(row => {
+        const grade = row.cells[2]?.textContent.trim();
+        const isVisible = selectedGrade === "" || grade === selectedGrade;
+
+        row.style.display = isVisible ? "" : "none";
+
+        if (isVisible) {
+            visibleRowCount++;
+            for (let i = 3, subjIdx = 0; subjIdx < 10; i += 2, subjIdx++) {
+                const score = parseFloat(row.cells[i]?.textContent.trim()) || 0;
+                subjectTotals[subjIdx] += score;
+            }
+
+            const totalCell = row.cells[row.cells.length - 2];
+            totalMarksSum += parseFloat(totalCell?.textContent.trim()) || 0;
+        }
+    });
+
+    if (visibleRowCount === 0) return;
+
+    const marksList = document.getElementById("marksList");
+
+    // Total row
+    const totalRow = document.createElement("tr");
+    totalRow.classList.add("summary-row");
+    totalRow.innerHTML = `
+        <td colspan="3" style="font-weight:bold;"> Total</td>
+        ${subjectTotals.map(t => `<td style="font-weight:bold;">${t}</td><td></td>`).join('')}
+        <td style="font-weight:bold;">${totalMarksSum}</td>
+        <td></td>
+    `;
+
+    // Average row
+    const averageRow = document.createElement("tr");
+    averageRow.classList.add("summary-row");
+    averageRow.innerHTML = `
+        <td colspan="3" style="font-weight:bold;"> Average</td>
+        ${subjectTotals.map(t => `<td style="font-weight:bold;">${(t / visibleRowCount).toFixed(2)}</td><td></td>`).join('')}
+        <td style="font-weight:bold;">${(totalMarksSum / visibleRowCount).toFixed(2)}</td>
+        <td></td>
+    `;
+
+    marksList.appendChild(totalRow);
+    marksList.appendChild(averageRow);
+}
+
+
+function printFilteredGrades() {
+  const selectedGrade = document.getElementById("gradeSelect").value;
+  const term = document.getElementById("termSelect")?.value || "Term 1";
+  const year = new Date().getFullYear();
+  const schoolName = "NACHU JUNIOR  SCHOOL";
+  const motto = "Excellence Through Knowledge";
+  const logoUrl = "https://i.imgur.com/uWrz8rt.png";
+
+  const rows = document.querySelectorAll("#marksList tr");
+
+  // Generate today's date in readable format
+  const today = new Date();
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const formattedDate = today.toLocaleDateString('en-US', options);
+
+  const printWindow = window.open('', '', 'height=900,width=1100');
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Filtered Merit List</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid black; padding: 8px; text-align: center; }
+          h2, h3, h4 { margin: 0; }
+          .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+          }
+          .school-info { text-align: left; }
+          .school-info .inline-details {
+            margin-top: 6px;
+            font-size: 16px;
+          }
+          .inline-details span {
+            margin-right: 20px;
+          }
+          .logo img {
+            max-height: 70px;
+            margin-left: 20px;
+          }
+          .stamp {
+            border: 2px solid blue;
+            color: blue;
+            text-align: center;
+            width: 200px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto;
+            font-weight: bold;
+            line-height: 1.3;
+            flex-direction: column;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="top-bar">
+          <div class="school-info">
+            <h2>${schoolName}</h2>
+            <h4><em>${motto}</em></h4>
+            <div class="inline-details">
+              <span><strong>Term:</strong> ${term}</span>
+              <span><strong>Grade:</strong> ${selectedGrade || "All"}</span>
+              <span><strong>Year:</strong> ${year}</span>
+            </div>
+          </div>
+          <div class="logo">
+            <img src="${logoUrl}" alt="School Logo">
+          </div>
+        </div>
+
+        <h3 style="text-align:center;">Merit List</h3>
+        <table>
+  `);
+
+  // Remove the last column header
+  const headerRow = document.querySelector(".report-table thead tr");
+  if (headerRow) {
+    const headerCells = headerRow.querySelectorAll('th');
+    if (headerCells.length > 0) {
+      headerCells[headerCells.length - 1].remove();
+    }
+  }
+
+  printWindow.document.write(document.querySelector(".report-table thead").outerHTML);
+
+  rows.forEach(row => {
+    if (row.style.display !== "none") {
+      const cells = row.querySelectorAll('td');
+      if (cells.length > 0) {
+        cells[cells.length - 1].remove();
+      }
+      printWindow.document.write(`<tr>${row.innerHTML}</tr>`);
+    }
+  });
+
+  // Stamp with your specified style
+  printWindow.document.write(`
+        </table>
+        <div class="stamp">
+          Nachu Junior School<br>
+          P.O. Box 561-0902, Kikuyu<br>
+          Date: ${formattedDate}
+        </div>
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+}
+function getLearnersFromTable() {
+    const rows = document.querySelectorAll('#learnersList tr');
+    const learners = [];
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 8) {
+            learners.push({
+                parentName: cells[6].textContent.trim(),
+                phone: cells[7].textContent.trim(),
+                grade: cells[4].textContent.trim()
+            });
+        }
+    });
+
+    return learners;
+}
+function populateGradeDropdown() {
+  // If learners array exists globally, use it
+  let grades = [];
+
+  if (typeof learners !== 'undefined' && Array.isArray(learners)) {
+    grades = [...new Set(learners.map(l => l.grade))];
+  } else {
+    // If learners array isn't global, try extracting from table instead
+    const rows = document.querySelectorAll('#learnersList tr');
+    const gradeSet = new Set();
+
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length >= 5) {
+        gradeSet.add(cells[4].textContent.trim());
+      }
+    });
+
+    grades = [...gradeSet];
+  }
+
+  grades.sort();
+
+  // Populate original dropdown (if it exists)
+  const mainDropdown = document.getElementById("gradeDropdown");
+  if (mainDropdown) {
+    mainDropdown.innerHTML = '<option value="">-- Select Grade --</option>';
+    grades.forEach(grade => {
+      const option = document.createElement("option");
+      option.value = grade;
+      option.textContent = grade;
+      mainDropdown.appendChild(option);
+    });
+  }
+
+  // Populate parent info dropdown (if it exists)
+  const parentDropdown = document.getElementById("gradeFilterDropdown");
+  if (parentDropdown) {
+    parentDropdown.innerHTML = '<option value="">-- All Grades --</option>';
+    grades.forEach(grade => {
+      const option = document.createElement("option");
+      option.value = grade;
+      option.textContent = grade;
+      parentDropdown.appendChild(option);
+    });
+  }
+}
+
+
+
+function filterParentInfoByGrade() {
+    const selectedGrade = document.getElementById('gradeFilterDropdown').value;
+    const learners = getLearnersFromTable();
+    const filtered = selectedGrade
+        ? learners.filter(l => l.grade === selectedGrade)
+        : learners;
+
+    const table = document.getElementById('parentInfoTable');
+    const body = document.getElementById('parentInfoBody');
+    body.innerHTML = "";
+
+   filtered.forEach((l, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${index + 1}</td> <!-- Dynamically display the index as Number -->
+        <td>${l.parentName}</td>
+        <td>${l.phone}</td>
+        <td>${l.grade}</td>
+        <td>${l.signature || ''}</td> <!-- Include the signature column -->
+    `;
+    body.appendChild(row);
+});
+
+table.style.display = filtered.length ? 'table' : 'none';
+}
+
+function printParentInfoTable() {
+    const table = document.getElementById('parentInfoTable');
+    if (table.style.display === 'none') {
+        alert("No data to print. Please select a grade.");
+        return;
+    }
+
+    const currentYear = new Date().getFullYear();
+
+    // Get grade dynamically from the first row's 4th column (index 3)
+    let grade = 'N/A';
+    const firstRow = table.querySelector('tbody tr');
+    if (firstRow) {
+        const cells = firstRow.querySelectorAll('td');
+        if (cells.length >= 4) {
+            grade = cells[3].textContent.trim();
+        }
+    }
+
+    const printWindow = window.open('', '', 'height=800,width=1000');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Parent Info</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                .header { text-align: center; }
+                .logo { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+                h2, h3 { margin: 5px 0; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <img src=" https://i.imgur.com/uWrz8rt.png" class="logo" alt="School Logo" />
+                <h2>NACHU COMPREHENSIVE  SCHOOL PARENTS ATTENDANCE REGISTER</h2>
+                <h3>ADDRESS: PO BOX 561-00902 KIKUYU, KENYA</h3>
+                <h3>Phone: +254-700-123456</h3>
+                <h3>School Motto: "HARD WORK PAYS"</h3>
+               <h3>Year: ${currentYear} / GRADE: ${grade}</h3>
+            </div>
+            ${table.outerHTML}
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.print();
+}
+function toggleLearnerCountTable() {
+  const container = document.getElementById("learnerCountContainer");
+  const button = document.getElementById("toggleLearnerCountBtn");
+
+  if (container.style.display === "block") {
+    container.style.display = "none";
+    button.innerHTML = `<i class="fas fa-table"></i> Show Learner Count`;
+  } else {
+    displayLearnerCountTable(); // Builds and shows the table
+    container.style.display = "block";
+    button.innerHTML = `<i class="fas fa-eye-slash"></i> Hide Learner Count`;
+  }
+}
+
+function displayLearnerCountTable() {
+  const gradeCounts = {};
+
+  feeDetails.forEach(detail => {
+    const grade = detail.grade;
+    gradeCounts[grade] = (gradeCounts[grade] || 0) + 1;
+  });
+
+  let tableHTML = `
+    <h2 style="color: #4CAF50; text-align: center;">Total Learners Per Grade</h2>
+    <table style="width: 50%; margin: 0 auto; border-collapse: collapse; text-align: center;">
+      <thead>
+        <tr style="background: #1976D2; color: white;">
+          <th style="border: 1px solid #ccc; padding: 10px;">Grade</th>
+          <th style="border: 1px solid #ccc; padding: 10px;">Number of Learners</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  Object.keys(gradeCounts).sort((a, b) => a - b).forEach(grade => {
+    tableHTML += `
+      <tr style="background: #f9f9f9;">
+        <td style="border: 1px solid #ccc; padding: 10px;">${grade}</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">${gradeCounts[grade]}</td>
+      </tr>
+    `;
+  });
+
+  tableHTML += `</tbody></table>`;
+
+  document.getElementById("learnerCountContainer").innerHTML = tableHTML;
+}
+function printLearnerCountTable() {
+  const tableContent = document.getElementById("learnerCountContainer").innerHTML;
+  const currentYear = new Date().getFullYear();
+
+  const printWindow = window.open("", "", "width=900,height=650");
+  printWindow.document.write(`
+    <html>
+    <head>
+      <title>Nachu Primary School - Learner Count</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          text-align: center;
+          color: black;
+        }
+        .header-container {
+          margin-bottom: 20px;
+        }
+        .header-container img {
+          max-width: 80px;
+        }
+        .header-container h2,
+        .header-container h3,
+        .header-container p {
+          margin: 5px 0;
+        }
+        table {
+          width: 80%;
+          margin: 0 auto;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+        th, td {
+          border: 2px solid black; /* black border for all cells */
+          padding: 10px;
+          text-align: center;
+          color: black;
+        }
+        th {
+          background-color: white;
+          font-weight: bold;
+        }
+        tr:nth-child(even) {
+          background-color: #f2f2f2;
+        }
+        .footer {
+          margin-top: 40px;
+          background-color: black;
+          color: white;
+          padding: 10px;
+          font-size: 14px;
+          text-align: center;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header-container">
+        <img src="https://i.imgur.com/uWrz8rt.png" alt="School Logo">
+        <h2>NACHU PRIMARY SCHOOL FEE REPORT</h2>
+        <p><strong>ADDRESS:</strong> PO BOX 561-00902 KIKUYU, KENYA</p>
+        <p><strong>Phone:</strong> +254-700-123456</p>
+        <p><strong>School Motto:</strong> "HARD WORK PAYS"</p>
+        <p><strong>Year:</strong> ${currentYear}</p>
+        <hr>
+      </div>
+
+      ${tableContent}
+
+      <div class="footer">
+        <p>Generated by <strong>Rasm School Automation Management System</strong></p>
+        <p><em>Your Gateway To Smooth And Efficient School Management Software</em></p>
+      </div>
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.print();
+}
  </script>         
                 
                 
