@@ -12728,13 +12728,11 @@ function generateCombinedMeritList(grades, term, exam) {
         { key: "Total Marks",  label: "Total Marks",  level: false }
     ];
 
-    // One total accumulator per column
     const subjectTotals = columns.map(() => 0);
     let totalMarksSum = 0;
 
     const gradesSet = new Set(grades.map(g => g.trim()));
 
-    // 1?? Gather matching data from localStorage
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (!key.startsWith("archivedMarks_")) continue;
@@ -12750,12 +12748,10 @@ function generateCombinedMeritList(grades, term, exam) {
         return;
     }
 
-    // 2?? Sort by Total Marks descending
     combinedData.sort((a, b) =>
         (parseInt(b["Total Marks"], 10) || 0) - (parseInt(a["Total Marks"], 10) || 0)
     );
 
-    // 3?? Build HTML
     let html = `
       <h3 style="font-weight:bold;">Combined Merit List for ${grades.join(", ")} | Term: ${term} | Exam: ${exam}</h3>
       <button onclick="printCombinedMeritList()">Print</button>
@@ -12765,40 +12761,42 @@ function generateCombinedMeritList(grades, term, exam) {
           <tr>
             <th>Pos</th>
             ${columns.map(col => `<th>${col.label}</th>${col.level ? "<th>Lev</th>" : ""}`).join("")}
+            <th>Performance Level</th>
           </tr>
         </thead>
         <tbody>
     `;
 
-    // 4?? Populate rows and accumulate
     combinedData.forEach((mark, idx) => {
         html += `<tr><td>${idx + 1}</td>`;
+        let totalMarksValue = 0;
+
         columns.forEach((col, ci) => {
             const raw = mark[col.key];
-            // For numeric columns (all except Learner & Grade), try parse
             const isNumeric = (col.key !== "Learner" && col.key !== "Grade");
             const num = isNumeric ? Number(raw) : NaN;
             const valid = isNumeric && !isNaN(num);
 
-            // Accumulate totals
             if (valid) {
                 subjectTotals[ci] += num;
-                if (col.key === "Total Marks") totalMarksSum += num;
+                if (col.key === "Total Marks") {
+                    totalMarksSum += num;
+                    totalMarksValue = num;
+                }
             }
 
-            // Display cell
             const display = valid ? num : (raw || "");
             html += `<td>${display}</td>`;
 
-            // Level cell if needed
             if (col.level) {
                 html += `<td>${valid ? getLevel(num) : ""}</td>`;
             }
         });
+
+        html += `<td>${getPerformanceLevel(totalMarksValue)}</td>`;
         html += `</tr>`;
     });
 
-    // 5?? Totals row
     html += `<tr><td colspan="1"><strong>Total</strong></td>`;
     columns.forEach((col, ci) => {
         if (col.key === "Learner" || col.key === "Grade") {
@@ -12810,9 +12808,8 @@ function generateCombinedMeritList(grades, term, exam) {
             if (col.level) html += `<td></td>`;
         }
     });
-    html += `</tr>`;
+    html += `<td></td></tr>`;
 
-    // 6?? Averages row
     const count = combinedData.length;
     html += `<tr><td colspan="1"><strong>Average</strong></td>`;
     columns.forEach((col, ci) => {
@@ -12826,13 +12823,13 @@ function generateCombinedMeritList(grades, term, exam) {
             if (col.level) html += `<td></td>`;
         }
     });
-    html += `</tr>`;
+    html += `<td></td></tr>`;
 
-    // 7?? Close table and inject
     html += `</tbody></table>`;
     document.getElementById("combinedMeritList").innerHTML = html;
     document.getElementById("combinedMeritSection").style.display = "block";
 }
+
 
 function deleteAllArchivedMarks() {
     if (confirm("?? Are you absolutely sure you want to permanently delete *all* archived marks? This cannot be undone!")) {
