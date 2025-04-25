@@ -12168,12 +12168,17 @@ window.onload = function () {
 function filterMarksByGrade() {
     const selectedGrade = document.getElementById("gradeSelect").value;
     const rows = Array.from(document.querySelectorAll("#marksList tr"));
-    
-    let subjectTotals = Array(10).fill(0);
-    let visibleRowCount = 0;
-    let totalMarksSum = 0;
 
-    // Remove existing totals/averages if present
+    // Indexes of actual subject scores (skip Lev columns)
+    const scoreIndexes = [3, 4, 5, 7, 8, 9, 11, 13, 15, 17, 19, 21, 23]; 
+    const totalMarksIndex = 23;
+
+    let subjectTotals = Array(scoreIndexes.length).fill(0);
+    let totalMarksSum = 0;
+    let visibleRowCount = 0;
+    let currentNumber = 1;
+
+    // Remove previous summaries
     document.querySelectorAll("#marksList .summary-row").forEach(row => row.remove());
 
     rows.forEach(row => {
@@ -12183,14 +12188,19 @@ function filterMarksByGrade() {
         row.style.display = isVisible ? "" : "none";
 
         if (isVisible) {
+            // Update row number
+            row.cells[0].textContent = currentNumber++;
             visibleRowCount++;
-            for (let i = 3, subjIdx = 0; subjIdx < 10; i += 2, subjIdx++) {
-                const score = parseFloat(row.cells[i]?.textContent.trim()) || 0;
-                subjectTotals[subjIdx] += score;
-            }
 
-            const totalCell = row.cells[row.cells.length - 2];
-            totalMarksSum += parseFloat(totalCell?.textContent.trim()) || 0;
+            scoreIndexes.forEach((idx, i) => {
+                const cell = row.cells[idx];
+                const val = parseFloat(cell?.textContent.trim()) || 0;
+                subjectTotals[i] += val;
+            });
+
+            const totalCell = row.cells[totalMarksIndex];
+            const totalVal = parseFloat(totalCell?.textContent.trim()) || 0;
+            totalMarksSum += totalVal;
         }
     });
 
@@ -12198,28 +12208,27 @@ function filterMarksByGrade() {
 
     const marksList = document.getElementById("marksList");
 
-    // Total row
-    const totalRow = document.createElement("tr");
-    totalRow.classList.add("summary-row");
-    totalRow.innerHTML = `
-        <td colspan="3" style="font-weight:bold;"> Total</td>
-        ${subjectTotals.map(t => `<td style="font-weight:bold;">${t}</td><td></td>`).join('')}
-        <td style="font-weight:bold;">${totalMarksSum}</td>
-        <td></td>
-    `;
+    // Helper: build subject-only <td> row
+    const buildSummaryRow = (label, values) => {
+        let cellHtml = `<td colspan="3" style="font-weight:bold;">${label}</td>`;
+        let col = 0;
+        for (let i = 3; i <= totalMarksIndex; i++) {
+            if (scoreIndexes.includes(i)) {
+                cellHtml += `<td style="font-weight:bold;">${values[col++]}</td>`;
+            } else {
+                cellHtml += `<td></td>`;
+            }
+        }
+        cellHtml += `<td></td>`; // Action column
+        return `<tr class="summary-row">${cellHtml}</tr>`;
+    };
 
-    // Average row
-    const averageRow = document.createElement("tr");
-    averageRow.classList.add("summary-row");
-    averageRow.innerHTML = `
-        <td colspan="3" style="font-weight:bold;"> Average</td>
-        ${subjectTotals.map(t => `<td style="font-weight:bold;">${(t / visibleRowCount).toFixed(2)}</td><td></td>`).join('')}
-        <td style="font-weight:bold;">${(totalMarksSum / visibleRowCount).toFixed(2)}</td>
-        <td></td>
-    `;
+    const totalValues = subjectTotals.map(t => t.toFixed(2));
+    const avgValues = subjectTotals.map(t => (t / visibleRowCount).toFixed(2));
 
-    marksList.appendChild(totalRow);
-    marksList.appendChild(averageRow);
+    // Add total and average rows
+    marksList.insertAdjacentHTML("beforeend", buildSummaryRow("Total", [...totalValues, totalMarksSum.toFixed(2)]));
+    marksList.insertAdjacentHTML("beforeend", buildSummaryRow("Average", [...avgValues, (totalMarksSum / visibleRowCount).toFixed(2)]));
 }
 
 
