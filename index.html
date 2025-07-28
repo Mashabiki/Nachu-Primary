@@ -4989,23 +4989,26 @@ function generateBulkReports() {
                 const formattedTime = currentDate.toLocaleTimeString();
 
                 // Logos
-                const schoolLogo = `<img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="max-width:100px; display:block; margin-bottom:10px; float:left;">`;
-                const centeredLogo = `<div style="text-align:center; margin-bottom:20px;">
-                    <img src="https://i.imgur.com/KkbIFjL.png" alt="New Logo" style="max-width:100px; height:auto;">
-                </div>`;
+                const schoolLogo = `<img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="max-width:100px; height:auto;">`;
+                const govtLogo = `<img src="https://i.imgur.com/KkbIFjL.png" alt="Govt Logo" style="max-width:100px; height:auto; margin-top:10px;">`;
 
                 // Generate the report template
                 return `
-                    ${centeredLogo}
                     <div style="clear:both; padding-bottom:10px;">
-                        ${schoolLogo}
-                        <div style="margin-left:110px;">
-                            <h2 style="margin:0; font-size:16px;"> NACHU PRIMARY  SCHOOL LEARNER'S  PROGRESS  REPORT</h2>
-                            <h3 style="margin:0; font-size:16px;">PO BOX 561-00902 KIKUYU, KENYA </h3>
-                            <h4 style="margin:0; font-size:16px;">MINISTRY OF EDUCATION SCIENCE AND TECHNOLOGY</h4>
-                            <h5 style="margin:0; font-size:16px;">SCHOOL MOTTO :MY TALENT MY PASSION </h5>
-            
- </div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="width: 120px;">
+                                ${schoolLogo}
+                            </div>
+                            <div style="flex-grow: 1; text-align: center;">
+                                <h2 style="margin: 0; font-size: 18px;"> NACHU PRIMARY SCHOOL LEARNER'S PROGRESS REPORT</h2>
+                                <h3 style="margin: 0; font-size: 16px;">PO BOX 561-00902 KIKUYU, KENYA </h3>
+                                <h4 style="margin: 0; font-size: 14px;">MINISTRY OF EDUCATION SCIENCE AND TECHNOLOGY</h4>
+                                <h5 style="margin: 0; font-size: 14px;">SCHOOL MOTTO: MY TALENT MY PASSION</h5>
+                            </div>
+                            <div style="width: 120px; text-align: right;">
+                                ${govtLogo}
+                            </div>
+                        </div>
                     </div>
                     <div class="report-details" style="display: flex; align-items: flex-start; justify-content: space-between; margin-top: 10px;">
                         <div>
@@ -5014,18 +5017,18 @@ function generateBulkReports() {
                             <strong>Grade:</strong> ${learnerData.grade}<br>
                             <strong>Learner's Name:</strong> ${learnerData.learner}
                         </div>
-                        <div id="learnerPhotoContainer-${learnerData.learner}">
+                        <div id="learnerPhotoContainer-${learnerData.learner}" style="text-align:center;">
                             ${photo}
                         </div>
                     </div>
-                    <table class="report-table">
+                    <table class="report-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                         <thead>
                             <tr>
-                                <th>Subject</th>
-                                <th>Scores</th>
-                                <th>Levels</th>
-                                <th>Subject Teacher</th>
-                                <th>Signature</th>
+                                <th style="border: 3px solid #000; padding: 8px; color: #000;">Subject</th>
+                                <th style="border: 3px solid #000; padding: 8px; color: #000;">Scores</th>
+                                <th style="border: 3px solid #000; padding: 8px; color: #000;">Levels</th>
+                                <th style="border: 3px solid #000; padding: 8px; color: #000;">Subject Teacher</th>
+                                <th style="border: 3px solid #000; padding: 8px; color: #000;">Signature</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -5038,12 +5041,11 @@ function generateBulkReports() {
                         </div>
                         <div style="flex: 1; text-align: center;">
                             <span style="font-size: 14px;">
-           KEY:1 Below Expectation, 2 Approaching Expectation, 3 Meeting Expectation, 4 Exceeding Expectation
-
+                                KEY: 1 Below Expectation, 2 Approaching Expectation, 3 Meeting Expectation, 4 Exceeding Expectation
                             </span>
                         </div>
                     </div>
-                    <div class="comment-section">
+                    <div class="comment-section" style="margin-top: 10px;">
                         Teacher Comments On Competencies Achieved/Acquisition Of Values: <br>
                         ${getComment(learnerData.totalMarks)}
                     </div>
@@ -5056,9 +5058,9 @@ function generateBulkReports() {
                         Opening Date: ${details.openingDate || 'N/A'}<br>
                         Class Teacher Signature: ${details.classTeacherSignature || '_____________'}<br>
                         Principal Signature: ${details.principalSignature || '_____________'}<br>
-                        Official Stamp: <div class="stamp">
-                             Nachu Primary   School <br>
-                            Po Box 561-00902 Kikuyu<br>
+                        Official Stamp: <div class="stamp" style="font-size: 14px;">
+                            Nachu Primary School <br>
+                            P.O. Box 561-00902 Kikuyu<br>
                             Date: ${formattedDate}<br>
                         </div>
                     </div>
@@ -5071,6 +5073,7 @@ function generateBulkReports() {
         });
     });
 }
+
 
 function generateSubjectRows(learnerData, teacherNames) {  
     // Define the subjects to keep
