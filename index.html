@@ -2866,7 +2866,7 @@ function updateLearnersTable() {
           
           // Hardcoded credentials (for demonstration purposes)
         const validUsername = "Nachu254";
-        const validPassword = "Nm643PpQ@";
+        const validPassword = "Nm";
 
         // Login form submission
         document.getElementById("loginForm").addEventListener("submit", function (e) {
@@ -4970,7 +4970,7 @@ function toggleJuniorSchoolActions() {
     const section = document.getElementById('juniorSchoolActions');
     section.style.display = (section.style.display === 'none') ? 'block' : 'none';
 }
-function generateBulkReports() { 
+function generateBulkReports() {  
     const selectedGrade = bulkGradeSelect.value;
     const learnersInGrade = marks.filter(mark => mark.grade === selectedGrade);
 
@@ -4981,7 +4981,7 @@ function generateBulkReports() {
                 const learner = learners.find(l => l.name === learnerData.learner);
                 const photo = learner && learner.photo
                     ? `<img src="${learner.photo}" alt="Photo" style="width:80px; height:80px; border-radius:5px; object-fit:cover;">`
-                    : '<div style="width:100px; height:100px; border:1px solid #ccc; text-align:center; line-height:100px;">No Photo</div>';
+                    : `<img src="https://i.imgur.com/BriDoqe.jpeg" alt="Avatar" style="width:80px; height:80px; border-radius:5px; object-fit:cover; opacity:0.9;">`;
 
                 // Current date and time
                 const currentDate = new Date();
@@ -5073,7 +5073,6 @@ function generateBulkReports() {
         });
     });
 }
-
 
 function generateSubjectRows(learnerData, teacherNames) {  
     // Define the subjects to keep
