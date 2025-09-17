@@ -6621,6 +6621,7 @@ function promoteLearners() {
     }
 }
 
+// Function to undo promotion (step back one grade)
 function undoPromotion() {
     console.log("Undoing promotion...");
 
@@ -6630,8 +6631,7 @@ function undoPromotion() {
     }
 
     learners.forEach(learner => {
-        const key = learner.id || learner.name;
-        const history = promotionHistory[key];
+        const history = gradeHistory[learner.name];
 
         if (history && history.length > 0) {
             // ✅ Use stored history if available
@@ -6644,7 +6644,7 @@ function undoPromotion() {
                 let currentGrade = parseInt(gradeMatch[1]);
                 let stream = gradeMatch[2];
 
-                if (currentGrade > 4) {  // prevent going below 4
+                if (currentGrade > 1) {  // prevent going below grade 1
                     learner.grade = (currentGrade - 1) + stream;
                     console.log(`Reverted (fallback) ${learner.name} → ${learner.grade}`);
                 }
@@ -6652,7 +6652,12 @@ function undoPromotion() {
         }
     });
 
-    saveLearners();
+    // Save changes
+    if (useIndexedDB) {
+        saveLearnersToIndexedDB();
+    } else {
+        saveLearnersToLocalStorage();
+    }
     updateLearnersTable();
 
     alert("Promotion undone successfully!");
