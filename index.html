@@ -6557,8 +6557,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// Object to store original grades before promotion
-let previousGrades = {};
+// Object to store grade history for each learner
+// Example: { "John": ["6A", "7A", "8A"] }
+let gradeHistory = {};
 
 // Function to promote learners
 function promoteLearners() {
@@ -6572,7 +6573,7 @@ function promoteLearners() {
     }
 
     // Iterate through learners and promote eligible ones
-    learners.forEach((learner, index) => {
+    learners.forEach((learner) => {
         console.log(`Processing learner: ${learner.name}, Grade: ${learner.grade}`);
 
         const gradeMatch = learner.grade.match(/^(\d+)([A-Z]*)$/);
@@ -6581,10 +6582,13 @@ function promoteLearners() {
             const stream = gradeMatch[2];
             console.log(`Current Grade: ${currentGrade}, Stream: ${stream}`);
 
-            // Store the original grade before promotion
-            if (!previousGrades[learner.name]) {
-                previousGrades[learner.name] = learner.grade;
+            // Initialize grade history if not already there
+            if (!gradeHistory[learner.name]) {
+                gradeHistory[learner.name] = [];
             }
+
+            // Save the current grade before promotion
+            gradeHistory[learner.name].push(learner.grade);
 
             // Promote learners in grades 4, 5, and 6
             if (currentGrade >= 4 && currentGrade <= 6) {
@@ -6617,22 +6621,63 @@ function promoteLearners() {
     }
 }
 
-// Function to undo promotion
 function undoPromotion() {
     console.log("Undoing promotion...");
 
-    if (Object.keys(previousGrades).length === 0) {
-        alert("No previous promotion records found!");
+    if (!learners || learners.length === 0) {
+        alert("No learners found!");
         return;
     }
 
-    // Iterate and revert grades
     learners.forEach(learner => {
-        if (previousGrades[learner.name]) {
-            learner.grade = previousGrades[learner.name]; // Restore original grade
-            console.log(`Reverted ${learner.name} to ${learner.grade}`);
+        const key = learner.id || learner.name;
+        const history = promotionHistory[key];
+
+        if (history && history.length > 0) {
+            // ✅ Use stored history if available
+            learner.grade = history.pop();
+            console.log(`Reverted ${learner.name} → ${learner.grade}`);
+        } else {
+            // 🔄 Fallback: derive previous grade if no history exists
+            const gradeMatch = learner.grade.match(/^(\d+)([A-Z]*)$/);
+            if (gradeMatch) {
+                let currentGrade = parseInt(gradeMatch[1]);
+                let stream = gradeMatch[2];
+
+                if (currentGrade > 4) {  // prevent going below 4
+                    learner.grade = (currentGrade - 1) + stream;
+                    console.log(`Reverted (fallback) ${learner.name} → ${learner.grade}`);
+                }
+            }
         }
     });
+
+    saveLearners();
+    updateLearnersTable();
+
+    alert("Promotion undone successfully!");
+}
+
+// Function to fully undo promotion (reset to original grade)
+function fullUndoPromotion() {
+    console.log("Full undo promotion...");
+
+    let reverted = false;
+
+    learners.forEach((learner) => {
+        if (gradeHistory[learner.name] && gradeHistory[learner.name].length > 0) {
+            const original = gradeHistory[learner.name][0]; // very first grade
+            learner.grade = original;
+            gradeHistory[learner.name] = []; // clear history
+            console.log(`Fully reverted ${learner.name} to ${learner.grade}`);
+            reverted = true;
+        }
+    });
+
+    if (!reverted) {
+        alert("⚠️ No original grade records found!");
+        return;
+    }
 
     // Update storage and UI
     if (useIndexedDB) {
@@ -6642,11 +6687,9 @@ function undoPromotion() {
     }
     updateLearnersTable();
 
-    // Clear the stored previous grades
-    previousGrades = {};
-
-    alert("Promotion undone successfully!");
+    alert("✅ All learners fully reset to their original grades!");
 }
+
 // Helper to detect storage type
 const useIndexedDB = window.indexedDB ? true : false;
 
